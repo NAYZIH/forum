@@ -6,24 +6,35 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 )
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+func FilterHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	if !strings.HasPrefix(path, "/filter/") {
 		ErrorHandler(w, r, http.StatusNotFound)
 		return
 	}
-	sessionID, _ := r.Cookie("session_id")
-	var user *functions.User
+	filter := strings.TrimPrefix(path, "/filter/")
 	var userID int
-	if sessionID != nil {
+	sessionID, err := r.Cookie("session_id")
+	if err == nil {
 		session, err := auth.GetSession(sessionID.Value)
 		if err == nil && session != nil {
-			user, _ = functions.GetUserByID(session.UserID)
 			userID = session.UserID
 		}
 	}
-	posts, err := functions.GetPosts("", "", userID) // Pas de filtre par défaut
+	if (filter == "created" || filter == "liked") && userID == 0 {
+		http.Error(w, "Non autorisé", http.StatusUnauthorized)
+		return
+	}
+	var posts []functions.Post
+	if filter == "category" {
+		category := r.URL.Query().Get("category")
+		posts, err = functions.GetPosts("category", category, userID)
+	} else {
+		posts, err = functions.GetPosts(filter, "", userID)
+	}
 	if err != nil {
 		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
@@ -38,8 +49,10 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		User  *functions.User
 		Posts []functions.Post
 	}{
-		User:  user,
 		Posts: posts,
+	}
+	if userID != 0 {
+		data.User, _ = functions.GetUserByID(userID)
 	}
 	t.Execute(w, data)
 }

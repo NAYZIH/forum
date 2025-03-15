@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Post.Title}}</title>
+    <link rel="stylesheet" href="/static/stylesheet/style.css">
+</head>
+<body>
+    <h1>{{.Post.Title}}</h1>
+    <p>{{.Post.Content}}</p>
+    <p>Catégories : {{range .Post.Categories}}{{.}} {{end}}</p>
+    <p>Likes : {{.Post.Likes}} | Dislikes : {{.Post.Dislikes}}</p>
+    {{if .User}}
+        <form action="/like/post/{{.Post.ID}}" method="post" style="display:inline;">
+            <input type="hidden" name="action" value="like">
+            <button type="submit">Like</button>
+        </form>
+        <form action="/like/post/{{.Post.ID}}" method="post" style="display:inline;">
+            <input type="hidden" name="action" value="dislike">
+            <button type="submit">Dislike</button>
+        </form>
+    {{end}}
+    <h2>Commentaires</h2>
+    {{range .Comments}}
+        <div class="comment">
+            <p>{{.Content}}</p>
+            <p>Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>
+            {{if $.User}}
+                <form action="/like/comment/{{.ID}}" method="post" style="display:inline;">
+                    <input type="hidden" name="action" value="like">
+                    <button type="submit">Like</button>
+                </form>
+                <form action="/like/comment/{{.ID}}" method="post" style="display:inline;">
+                    <input type="hidden" name="action" value="dislike">
+                    <button type="submit">Dislike</button>
+                </form>
+            {{end}}
+        </div>
+    {{else}}
+        <p>Aucun commentaire.</p>
+    {{end}}
+    {{if .User}}
+        <h3>Ajouter un commentaire</h3>
+        <form action="/post/{{.Post.ID}}/comment" method="post">
+            <textarea name="content" required></textarea><br>
+            <button type="submit">Commenter</button>
+        </form>
+    {{end}}
+    <p><a href="/">Retour à l'accueil</a></p>
+</body>
+</html>

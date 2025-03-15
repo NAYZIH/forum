@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="/static/stylesheet/style.css">
+</head>
+<body>
+    <h1>Inscription</h1>
+    <form action="/register" method="post">
+        <label>Email : <input type="email" name="email" required></label><br>
+        <label>Nom d'utilisateur : <input type="text" name="username" required></label><br>
+        <label>Mot de passe : <input type="password" name="password" required></label><br>
+        <button type="submit">S'inscrire</button>
+    </form>
+    <p><a href="/login">Déjà un compte ? Connectez-vous</a></p>
+</body>
+</html>

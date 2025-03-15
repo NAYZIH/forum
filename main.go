@@ -1,7 +1,11 @@
 package main
 
-import "forum/backend"
+import (
+	"forum/backend"
+	"forum/backend/database"
+)
 
 func main() {
-	backend.Launcher()
+	database.InitDB()  // Initialise la base de données
+	backend.Launcher() // Lance le serveur
 }

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle Publication</title>
+    <link rel="stylesheet" href="/static/stylesheet/style.css">
+</head>
+<body>
+    <h1>Nouvelle Publication</h1>
+    <form action="/post/new" method="post">
+        <label>Titre : <input type="text" name="title" required></label><br>
+        <label>Contenu : <textarea name="content" required></textarea></label><br>
+        <label>Catégories (séparées par des virgules) : <input type="text" name="categories"></label><br>
+        <button type="submit">Publier</button>
+    </form>
+    <p><a href="/">Retour</a></p>
+</body>
+</html>

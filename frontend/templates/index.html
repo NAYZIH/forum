@@ -1,11 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceuil</title>
+    <title>Forum - Accueil</title>
+    <link rel="stylesheet" href="/static/stylesheet/style.css">
 </head>
 <body>
-    
+    <h1>Forum</h1>
+    {{if .User}}
+        <p>Bienvenue, {{.User.Username}} | <a href="/post/new">Nouvelle publication</a> | 
+        <form action="/logout" method="post" style="display:inline;">
+            <button type="submit">Déconnexion</button>
+        </form></p>
+        <p>Filtres : <a href="/filter/category?category=tech">Tech</a> | 
+        <a href="/filter/created">Mes publications</a> | <a href="/filter/liked">Publications aimées</a></p>
+    {{else}}
+        <p><a href="/login">Connexion</a> | <a href="/register">Inscription</a></p>
+    {{end}}
+    <h2>Publications</h2>
+    {{range .Posts}}
+        <div class="post">
+            <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
+            <p>{{.Content}}</p>
+            <p>Catégories : {{range .Categories}}{{.}} {{end}}</p>
+            <p>Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>
+            {{if $.User}}
+                <form action="/like/post/{{.ID}}" method="post" style="display:inline;">
+                    <input type="hidden" name="action" value="like">
+                    <button type="submit">Like</button>
+                </form>
+                <form action="/like/post/{{.ID}}" method="post" style="display:inline;">
+                    <input type="hidden" name="action" value="dislike">
+                    <button type="submit">Dislike</button>
+                </form>
+            {{end}}
+        </div>
+    {{else}}
+        <p>Aucune publication.</p>
+    {{end}}
 </body>
 </html>
