@@ -16,6 +16,7 @@ func Launcher() {
 	http.HandleFunc("/login", handlers.LoginHandler)
 	http.HandleFunc("/logout", handlers.LogoutHandler)
 	http.HandleFunc("/profile", handlers.ProfileHandler)
+	http.HandleFunc("/profile/", handlers.ProfileHandler)
 	http.HandleFunc("/profile/edit", handlers.EditProfileHandler)
 	http.HandleFunc("/post/new", handlers.NewPostHandler)
 	http.HandleFunc("/post/", handlers.PostHandler)

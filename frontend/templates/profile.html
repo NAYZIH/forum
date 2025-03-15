@@ -18,6 +18,7 @@
     {{range .Posts}}
         <div class="post">
             <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
+            <p>Par {{.Username}} le {{.CreatedAt}}</p>
             <p>{{.Content}}</p>
         </div>
     {{else}}
@@ -26,6 +27,7 @@
     <h2>Commentaires</h2>
     {{range .Comments}}
         <div class="comment">
+            <p><strong>{{.Username}}</strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
             <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostID}}</a></p>
         </div>

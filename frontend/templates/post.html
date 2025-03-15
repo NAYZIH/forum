@@ -8,6 +8,7 @@
 </head>
 <body>
     <h1>{{.Post.Title}}</h1>
+    <p>Par <a href="/profile/{{.Post.UserID}}">{{.Post.Username}}</a> le {{.Post.CreatedAt}}</p>
     <p>{{.Post.Content}}</p>
     <p>Catégories : {{range .Post.Categories}}{{.}} {{end}}</p>
     <p>Likes : {{.Post.Likes}} | Dislikes : {{.Post.Dislikes}}</p>
@@ -24,6 +25,7 @@
     <h2>Commentaires</h2>
     {{range .Comments}}
         <div class="comment">
+            <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
             <p>Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>
             {{if $.User}}

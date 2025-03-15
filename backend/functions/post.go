@@ -50,9 +50,14 @@ func CreatePost(userID int, title, content string, categories []string) error {
 }
 
 func GetPostByID(id int) (*models.Post, error) {
-	row := database.DB.QueryRow("SELECT id, user_id, title, content, created_at FROM posts WHERE id = ?", id)
+	row := database.DB.QueryRow(`
+        SELECT p.id, p.user_id, u.username, p.title, p.content, p.created_at
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.id = ?
+    `, id)
 	post := &models.Post{}
-	err := row.Scan(&post.ID, &post.UserID, &post.Title, &post.Content, &post.CreatedAt)
+	err := row.Scan(&post.ID, &post.UserID, &post.Username, &post.Title, &post.Content, &post.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +83,9 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 	switch filter {
 	case "category":
 		query = `
-            SELECT p.id, p.user_id, p.title, p.content, p.created_at
+            SELECT p.id, p.user_id, u.username, p.title, p.content, p.created_at
             FROM posts p
+            JOIN users u ON p.user_id = u.id
             JOIN post_categories pc ON p.id = pc.post_id
             JOIN categories c ON pc.category_id = c.id
             WHERE c.name = ?
@@ -88,23 +94,30 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 		args = []interface{}{category}
 	case "created":
 		query = `
-            SELECT id, user_id, title, content, created_at
-            FROM posts
-            WHERE user_id = ?
-            ORDER BY created_at DESC
+            SELECT p.id, p.user_id, u.username, p.title, p.content, p.created_at
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.user_id = ?
+            ORDER BY p.created_at DESC
         `
 		args = []interface{}{userID}
 	case "liked":
 		query = `
-            SELECT p.id, p.user_id, p.title, p.content, p.created_at
+            SELECT p.id, p.user_id, u.username, p.title, p.content, p.created_at
             FROM posts p
+            JOIN users u ON p.user_id = u.id
             JOIN post_likes pl ON p.id = pl.post_id
             WHERE pl.user_id = ? AND pl.value = 1
             ORDER BY p.created_at DESC
         `
 		args = []interface{}{userID}
 	default:
-		query = "SELECT id, user_id, title, content, created_at FROM posts ORDER BY created_at DESC"
+		query = `
+            SELECT p.id, p.user_id, u.username, p.title, p.content, p.created_at
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            ORDER BY p.created_at DESC
+        `
 	}
 	rows, err := database.DB.Query(query, args...)
 	if err != nil {
@@ -114,7 +127,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var p models.Post
-		err := rows.Scan(&p.ID, &p.UserID, &p.Title, &p.Content, &p.CreatedAt)
+		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.CreatedAt)
 		if err != nil {
 			return nil, err
 		}

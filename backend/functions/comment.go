@@ -11,7 +11,13 @@ func CreateComment(postID, userID int, content string) error {
 }
 
 func GetCommentsByPostID(postID int) ([]models.Comment, error) {
-	rows, err := database.DB.Query("SELECT id, post_id, user_id, content, created_at FROM comments WHERE post_id = ? ORDER BY created_at ASC", postID)
+	rows, err := database.DB.Query(`
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.post_id = ?
+        ORDER BY c.created_at ASC
+    `, postID)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +25,7 @@ func GetCommentsByPostID(postID int) ([]models.Comment, error) {
 	var comments []models.Comment
 	for rows.Next() {
 		var c models.Comment
-		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Content, &c.CreatedAt)
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -37,7 +43,13 @@ func GetCommentsByPostID(postID int) ([]models.Comment, error) {
 }
 
 func GetCommentsByUserID(userID int) ([]models.Comment, error) {
-	rows, err := database.DB.Query("SELECT id, post_id, user_id, content, created_at FROM comments WHERE user_id = ? ORDER BY created_at DESC", userID)
+	rows, err := database.DB.Query(`
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.user_id = ?
+        ORDER BY c.created_at DESC
+    `, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +57,7 @@ func GetCommentsByUserID(userID int) ([]models.Comment, error) {
 	var comments []models.Comment
 	for rows.Next() {
 		var c models.Comment
-		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Content, &c.CreatedAt)
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
