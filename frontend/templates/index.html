@@ -13,7 +13,13 @@
         <form action="/logout" method="post" style="display:inline;">
             <button type="submit">Déconnexion</button>
         </form></p>
-        <p>Filtres : <a href="/filter/created">Mes publications</a> | <a href="/filter/liked">Publications aimées</a></p>
+        <p>Filtres : 
+            {{range .Categories}}
+                <a href="/filter/category?category={{.}}">{{.}}</a> | 
+            {{end}}
+            <a href="/filter/created">Mes publications</a> | 
+            <a href="/filter/liked">Publications aimées</a>
+        </p>
     {{else}}
         <p><a href="/login">Connexion</a> | <a href="/register">Inscription</a></p>
     {{end}}

@@ -104,18 +104,63 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
+
+	categories, err := functions.GetAllCategories()
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+
 	if r.Method == "GET" {
 		t, err := template.ParseFiles("frontend/templates/newpost.html")
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return
 		}
-		t.Execute(w, nil)
+		data := struct {
+			Categories []string
+			Error      string
+		}{
+			Categories: categories,
+			Error:      "",
+		}
+		t.Execute(w, data)
 	} else if r.Method == "POST" {
 		title := r.FormValue("title")
 		content := r.FormValue("content")
-		categories := strings.Split(r.FormValue("categories"), ",")
-		err := functions.CreatePost(session.UserID, title, content, categories)
+		selectedCategories := r.Form["categories[]"]
+		newCategoriesStr := r.FormValue("new_categories")
+
+		newCategories := strings.Split(newCategoriesStr, ",")
+		for i, cat := range newCategories {
+			newCategories[i] = strings.TrimSpace(cat)
+		}
+
+		var allCategories []string
+		for _, cat := range append(selectedCategories, newCategories...) {
+			if cat != "" {
+				allCategories = append(allCategories, cat)
+			}
+		}
+
+		if len(allCategories) == 0 {
+			t, err := template.ParseFiles("frontend/templates/newpost.html")
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			data := struct {
+				Categories []string
+				Error      string
+			}{
+				Categories: categories,
+				Error:      "Veuillez sélectionner ou créer au moins une catégorie.",
+			}
+			t.Execute(w, data)
+			return
+		}
+
+		err = functions.CreatePost(session.UserID, title, content, allCategories)
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return

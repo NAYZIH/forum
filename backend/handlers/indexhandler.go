@@ -29,6 +29,11 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
+	categories, err := functions.GetAllCategories()
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
 	t, err := template.ParseFiles("frontend/templates/index.html")
 	if err != nil {
 		log.Println("Erreur de template :", err)
@@ -36,11 +41,13 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		User  *models.User
-		Posts []models.Post
+		User       *models.User
+		Posts      []models.Post
+		Categories []string
 	}{
-		User:  user,
-		Posts: posts,
+		User:       user,
+		Posts:      posts,
+		Categories: categories,
 	}
 	t.Execute(w, data)
 }

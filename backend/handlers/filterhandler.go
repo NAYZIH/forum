@@ -47,13 +47,15 @@ func FilterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		User  *models.User
-		Posts []models.Post
+		User       *models.User
+		Posts      []models.Post
+		Categories []string
 	}{
 		Posts: posts,
 	}
 	if userID != 0 {
 		data.User, _ = functions.GetUserByID(userID)
 	}
+	data.Categories, _ = functions.GetAllCategories()
 	t.Execute(w, data)
 }

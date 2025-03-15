@@ -8,10 +8,19 @@
 </head>
 <body>
     <h1>Nouvelle Publication</h1>
+    {{if .Error}}
+        <p style="color: red;">{{.Error}}</p>
+    {{end}}
     <form action="/post/new" method="post">
         <label>Titre : <input type="text" name="title" required></label><br>
         <label>Contenu : <textarea name="content" required></textarea></label><br>
-        <label>Catégories (séparées par des virgules) : <input type="text" name="categories"></label><br>
+        <h2>Catégories</h2>
+        <p>Sélectionnez des catégories existantes :</p>
+        {{range .Categories}}
+            <label><input type="checkbox" name="categories[]" value="{{.}}">{{.}}</label><br>
+        {{end}}
+        <p>Ajouter de nouvelles catégories (séparées par des virgules) :</p>
+        <input type="text" name="new_categories"><br>
         <button type="submit">Publier</button>
     </form>
     <p><a href="/">Retour</a></p>

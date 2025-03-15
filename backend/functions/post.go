@@ -22,6 +22,9 @@ func CreatePost(userID int, title, content string, categories []string) error {
 		return err
 	}
 	for _, cat := range categories {
+		if cat == "" {
+			continue
+		}
 		var catID int
 		err = tx.QueryRow("SELECT id FROM categories WHERE name = ?", cat).Scan(&catID)
 		if err == sql.ErrNoRows {
