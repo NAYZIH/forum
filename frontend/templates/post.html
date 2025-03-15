@@ -43,7 +43,7 @@
     {{if .User}}
         <h3>Ajouter un commentaire</h3>
         <form action="/post/{{.Post.ID}}/comment" method="post">
-            <textarea name="content" required></textarea><br>
+            <textarea name="content" placeholder="Ajouter un commentaire" required></textarea><br>
             <button type="submit">Commenter</button>
         </form>
     {{end}}

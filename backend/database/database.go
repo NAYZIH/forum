@@ -17,7 +17,6 @@ func InitDB() {
 		log.Fatal("Erreur lors de l'ouverture de la base de données :", err)
 	}
 
-	// Charger et exécuter le schéma SQL
 	schema, err := os.ReadFile("backend/database/schema.sql")
 	if err != nil {
 		log.Fatal("Erreur lors de la lecture de schema.sql :", err)

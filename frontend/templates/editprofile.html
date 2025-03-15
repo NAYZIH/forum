@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier le profil</title>
+    <link rel="stylesheet" href="/static/stylesheet/style.css">
+</head>
+<body>
+    <h1>Modifier le profil</h1>
+    {{if .Error}}
+        <p style="color: red;">{{.Error}}</p>
+    {{end}}
+    <form action="/profile/edit" method="post">
+        <label>Nom d'utilisateur : <input type="text" name="username" value="{{.User.Username}}" required></label><br>
+        <label>Email : <input type="email" name="email" value="{{.User.Email}}" required></label><br>
+        <label>Mot de passe actuel : <input type="password" name="current_password" required></label><br>
+        <button type="submit">Enregistrer les modifications</button>
+    </form>
+    <p><a href="/profile">Retour au profil</a></p>
+</body>
+</html>

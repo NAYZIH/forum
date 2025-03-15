@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil de {{.User.Username}}</title>
+    <link rel="stylesheet" href="/static/stylesheet/style.css">
+</head>
+<body>
+    <h1>Profil de {{.User.Username}}</h1>
+    <p>Inscrit le : {{.User.CreatedAt}}</p>
+    <p>Nombre de publications : {{len .Posts}}</p>
+    <p>Nombre de commentaires : {{len .Comments}}</p>
+    {{if .IsOwnProfile}}
+        <p><a href="/profile/edit">Modifier le profil</a></p>
+    {{end}}
+    <h2>Publications</h2>
+    {{range .Posts}}
+        <div class="post">
+            <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
+            <p>{{.Content}}</p>
+        </div>
+    {{else}}
+        <p>Aucune publication.</p>
+    {{end}}
+    <h2>Commentaires</h2>
+    {{range .Comments}}
+        <div class="comment">
+            <p>{{.Content}}</p>
+            <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostID}}</a></p>
+        </div>
+    {{else}}
+        <p>Aucun commentaire.</p>
+    {{end}}
+    <p><a href="/">Retour à l'accueil</a></p>
+</body>
+</html>

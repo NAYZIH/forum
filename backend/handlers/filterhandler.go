@@ -3,6 +3,7 @@ package handlers
 import (
 	"forum/backend/auth"
 	"forum/backend/functions"
+	"forum/backend/models"
 	"html/template"
 	"log"
 	"net/http"
@@ -28,7 +29,7 @@ func FilterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Non autorisé", http.StatusUnauthorized)
 		return
 	}
-	var posts []functions.Post
+	var posts []models.Post
 	if filter == "category" {
 		category := r.URL.Query().Get("category")
 		posts, err = functions.GetPosts("category", category, userID)
@@ -46,8 +47,8 @@ func FilterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		User  *functions.User
-		Posts []functions.Post
+		User  *models.User
+		Posts []models.Post
 	}{
 		Posts: posts,
 	}

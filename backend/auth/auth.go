@@ -37,7 +37,7 @@ func GetSession(sessionID string) (*Session, error) {
 		return nil, err
 	}
 	if time.Now().After(s.ExpiresAt) {
-		return nil, nil // Session expirée
+		return nil, nil
 	}
 	return s, nil
 }
@@ -59,7 +59,6 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
-		// Ajouter l'utilisateur au contexte si nécessaire
 		next(w, r)
 	}
 }

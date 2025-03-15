@@ -3,6 +3,7 @@ package handlers
 import (
 	"forum/backend/auth"
 	"forum/backend/functions"
+	"forum/backend/models"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,7 +15,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sessionID, _ := r.Cookie("session_id")
-	var user *functions.User
+	var user *models.User
 	var userID int
 	if sessionID != nil {
 		session, err := auth.GetSession(sessionID.Value)
@@ -23,7 +24,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			userID = session.UserID
 		}
 	}
-	posts, err := functions.GetPosts("", "", userID) // Pas de filtre par défaut
+	posts, err := functions.GetPosts("", "", userID)
 	if err != nil {
 		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
@@ -35,8 +36,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		User  *functions.User
-		Posts []functions.Post
+		User  *models.User
+		Posts []models.Post
 	}{
 		User:  user,
 		Posts: posts,

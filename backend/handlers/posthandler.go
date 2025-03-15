@@ -3,6 +3,7 @@ package handlers
 import (
 	"forum/backend/auth"
 	"forum/backend/functions"
+	"forum/backend/models"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -154,9 +155,9 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		data := struct {
-			Post     *functions.Post
-			Comments []functions.Comment
-			User     *functions.User
+			Post     *models.Post
+			Comments []models.Comment
+			User     *models.User
 		}{
 			Post:     post,
 			Comments: comments,

@@ -2,17 +2,10 @@ package functions
 
 import (
 	"forum/backend/database"
+	"forum/backend/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
-
-type User struct {
-	ID        int
-	Email     string
-	Username  string
-	Password  string // Haché
-	CreatedAt string
-}
 
 func CreateUser(email, username, password string) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -24,9 +17,9 @@ func CreateUser(email, username, password string) error {
 	return err
 }
 
-func GetUserByEmail(email string) (*User, error) {
+func GetUserByEmail(email string) (*models.User, error) {
 	row := database.DB.QueryRow("SELECT id, email, username, password, created_at FROM users WHERE email = ?", email)
-	user := &User{}
+	user := &models.User{}
 	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.CreatedAt)
 	if err != nil {
 		return nil, err
@@ -34,9 +27,9 @@ func GetUserByEmail(email string) (*User, error) {
 	return user, nil
 }
 
-func GetUserByID(id int) (*User, error) {
+func GetUserByID(id int) (*models.User, error) {
 	row := database.DB.QueryRow("SELECT id, email, username, password, created_at FROM users WHERE id = ?", id)
-	user := &User{}
+	user := &models.User{}
 	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.CreatedAt)
 	if err != nil {
 		return nil, err
@@ -44,14 +37,28 @@ func GetUserByID(id int) (*User, error) {
 	return user, nil
 }
 
-func Authenticate(email, password string) (*User, error) {
+func Authenticate(email, password string) (*models.User, error) {
 	user, err := GetUserByEmail(email)
 	if err != nil {
-		return nil, err // Ne pas préciser "email non trouvé" pour la sécurité
+		return nil, err
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, err // "Mot de passe incorrect" masqué sous une erreur générique
+		return nil, err
 	}
 	return user, nil
+}
+
+func UpdateUser(id int, username, email string) error {
+	_, err := database.DB.Exec("UPDATE users SET username = ?, email = ? WHERE id = ?", username, email, id)
+	return err
+}
+
+func EmailExists(email string, excludeUserID int) (bool, error) {
+	var count int
+	err := database.DB.QueryRow("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?", email, excludeUserID).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
