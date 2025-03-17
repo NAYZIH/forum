@@ -11,9 +11,10 @@
     {{if .Error}}
         <p style="color: red;">{{.Error}}</p>
     {{end}}
-    <form action="/post/new" method="post">
+    <form action="/post/new" method="post" enctype="multipart/form-data">
         <label>Titre : <input type="text" name="title" required></label><br>
         <label>Contenu : <textarea name="content" required></textarea></label><br>
+        <label>Image (optionnelle, max 20 Mo) : <input type="file" name="image" accept="image/jpeg,image/png,image/gif"></label><br>
         <h2>Catégories</h2>
         <p>Sélectionnez des catégories existantes :</p>
         {{range .Categories}}

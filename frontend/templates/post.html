@@ -9,6 +9,9 @@
 <body>
     <h1>{{.Post.Title}}</h1>
     <p>Par <a href="/profile/{{.Post.UserID}}">{{.Post.Username}}</a> le {{.Post.CreatedAt}}</p>
+    {{if .Post.ImagePath}}
+        <img src="{{.Post.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
+    {{end}}
     <p>{{.Post.Content}}</p>
     <p>Catégories : {{range .Post.Categories}}{{.}} {{end}}</p>
     <p>Likes : {{.Post.Likes}} | Dislikes : {{.Post.Dislikes}}</p>

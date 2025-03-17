@@ -28,6 +28,9 @@
         <div class="post">
             <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
             <p>Par <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
+            {{if .ImagePath}}
+                <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
+            {{end}}
             <p>{{.Content}}</p>
             <p>Catégories : {{range .Categories}}{{.}} {{end}}</p>
             <p>Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>

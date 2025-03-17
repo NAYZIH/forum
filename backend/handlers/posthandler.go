@@ -5,7 +5,10 @@ import (
 	"forum/backend/functions"
 	"forum/backend/models"
 	"html/template"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -93,6 +96,9 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+const maxUploadSize = 20 * 1024 * 1024
+const uploadPath = "./frontend/static/images/posts/"
+
 func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 	sessionID, err := r.Cookie("session_id")
 	if err != nil {
@@ -126,6 +132,12 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		t.Execute(w, data)
 	} else if r.Method == "POST" {
+		err := r.ParseMultipartForm(maxUploadSize)
+		if err != nil {
+			http.Error(w, "Fichier trop volumineux", http.StatusBadRequest)
+			return
+		}
+
 		title := r.FormValue("title")
 		content := r.FormValue("content")
 		selectedCategories := r.Form["categories[]"]
@@ -160,7 +172,64 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = functions.CreatePost(session.UserID, title, content, allCategories)
+		file, handler, err := r.FormFile("image")
+		var imagePath string
+		if err == nil {
+			defer file.Close()
+
+			if handler.Size > maxUploadSize {
+				t, _ := template.ParseFiles("frontend/templates/newpost.html")
+				data := struct {
+					Categories []string
+					Error      string
+				}{
+					Categories: categories,
+					Error:      "L'image est trop volumineuse (max 20 Mo).",
+				}
+				t.Execute(w, data)
+				return
+			}
+
+			ext := strings.ToLower(filepath.Ext(handler.Filename))
+			allowedExts := []string{".jpg", ".jpeg", ".png", ".gif"}
+			validExt := false
+			for _, allowed := range allowedExts {
+				if ext == allowed {
+					validExt = true
+					break
+				}
+			}
+			if !validExt {
+				t, _ := template.ParseFiles("frontend/templates/newpost.html")
+				data := struct {
+					Categories []string
+					Error      string
+				}{
+					Categories: categories,
+					Error:      "Extension d'image non supportée (JPEG, PNG, GIF uniquement).",
+				}
+				t.Execute(w, data)
+				return
+			}
+
+			if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+
+			imagePath = uploadPath + strconv.FormatInt(time.Now().UnixNano(), 10) + ext
+			f, err := os.OpenFile(imagePath, os.O_WRONLY|os.O_CREATE, 0666)
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			defer f.Close()
+			io.Copy(f, file)
+
+			imagePath = "/static/images/posts/" + filepath.Base(imagePath)
+		}
+
+		err = functions.CreatePost(session.UserID, title, content, allCategories, imagePath)
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return

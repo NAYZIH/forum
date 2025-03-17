@@ -8,6 +8,7 @@ type Post struct {
 	Username   string
 	Title      string
 	Content    string
+	ImagePath  string
 	CreatedAt  time.Time
 	Categories []string
 	Likes      int
