@@ -68,6 +68,28 @@
         <p>Aucun commentaire.</p>
     {{end}}
 
+    <h2>Commentaires aimés</h2>
+    {{range .LikedComments}}
+        <div class="comment">
+            <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
+            <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
+            <p>{{.Content}}</p>
+        </div>
+    {{else}}
+        <p>Aucun commentaire aimé.</p>
+    {{end}}
+
+    <h2>Commentaires non aimés</h2>
+    {{range .DislikedComments}}
+        <div class="comment">
+            <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
+            <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
+            <p>{{.Content}}</p>
+        </div>
+    {{else}}
+        <p>Aucun commentaire non aimé.</p>
+    {{end}}
+    
     <p><a href="/">Retour à l'accueil</a></p>
 </body>
 </html>

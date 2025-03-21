@@ -65,6 +65,16 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
+	likedComments, err := functions.GetLikedCommentsByUserID(targetUserID)
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+	dislikedComments, err := functions.GetDislikedCommentsByUserID(targetUserID)
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
 	var currentUserID int
 	sessionID, _ := r.Cookie("session_id")
 	if sessionID != nil {
@@ -79,19 +89,23 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		User          *models.User
-		Posts         []models.Post
-		Comments      []models.Comment
-		LikedPosts    []models.Post
-		DislikedPosts []models.Post
-		IsOwnProfile  bool
+		User             *models.User
+		Posts            []models.Post
+		Comments         []models.Comment
+		LikedPosts       []models.Post
+		DislikedPosts    []models.Post
+		LikedComments    []models.Comment
+		DislikedComments []models.Comment
+		IsOwnProfile     bool
 	}{
-		User:          targetUser,
-		Posts:         posts,
-		Comments:      comments,
-		LikedPosts:    likedPosts,
-		DislikedPosts: dislikedPosts,
-		IsOwnProfile:  currentUserID == targetUserID,
+		User:             targetUser,
+		Posts:            posts,
+		Comments:         comments,
+		LikedPosts:       likedPosts,
+		DislikedPosts:    dislikedPosts,
+		LikedComments:    likedComments,
+		DislikedComments: dislikedComments,
+		IsOwnProfile:     currentUserID == targetUserID,
 	}
 	t.Execute(w, data)
 }

@@ -68,3 +68,55 @@ func GetCommentsByUserID(userID int) ([]models.Comment, error) {
 	}
 	return comments, nil
 }
+
+func GetLikedCommentsByUserID(userID int) ([]models.Comment, error) {
+	rows, err := database.DB.Query(`
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at, p.title
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        JOIN posts p ON c.post_id = p.id
+        JOIN comment_likes cl ON c.id = cl.comment_id
+        WHERE cl.user_id = ? AND cl.value = 1
+        ORDER BY cl.created_at DESC
+    `, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var comments []models.Comment
+	for rows.Next() {
+		var c models.Comment
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt, &c.PostTitle)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, c)
+	}
+	return comments, nil
+}
+
+func GetDislikedCommentsByUserID(userID int) ([]models.Comment, error) {
+	rows, err := database.DB.Query(`
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at, p.title
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        JOIN posts p ON c.post_id = p.id
+        JOIN comment_likes cl ON c.id = cl.comment_id
+        WHERE cl.user_id = ? AND cl.value = -1
+        ORDER BY cl.created_at DESC
+    `, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var comments []models.Comment
+	for rows.Next() {
+		var c models.Comment
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt, &c.PostTitle)
+		if err != nil {
+			return nil, err
+		}
+		comments = append(comments, c)
+	}
+	return comments, nil
+}
