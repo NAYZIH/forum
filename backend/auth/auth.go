@@ -2,19 +2,14 @@ package auth
 
 import (
 	"forum/backend/database"
+	"forum/backend/models"
 	"net/http"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-type Session struct {
-	SessionID string
-	UserID    int
-	ExpiresAt time.Time
-}
-
-func CreateSession(userID int) (*Session, error) {
+func CreateSession(userID int) (*models.Session, error) {
 	sessionID := uuid.New().String()
 	expiresAt := time.Now().Add(24 * time.Hour)
 	_, err := database.DB.Exec("INSERT INTO sessions (session_id, user_id, expires_at) VALUES (?, ?, ?)",
@@ -22,16 +17,16 @@ func CreateSession(userID int) (*Session, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Session{
+	return &models.Session{
 		SessionID: sessionID,
 		UserID:    userID,
 		ExpiresAt: expiresAt,
 	}, nil
 }
 
-func GetSession(sessionID string) (*Session, error) {
+func GetSession(sessionID string) (*models.Session, error) {
 	row := database.DB.QueryRow("SELECT session_id, user_id, expires_at FROM sessions WHERE session_id = ?", sessionID)
-	s := &Session{}
+	s := &models.Session{}
 	err := row.Scan(&s.SessionID, &s.UserID, &s.ExpiresAt)
 	if err != nil {
 		return nil, err

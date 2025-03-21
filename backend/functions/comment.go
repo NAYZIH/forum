@@ -44,9 +44,10 @@ func GetCommentsByPostID(postID int) ([]models.Comment, error) {
 
 func GetCommentsByUserID(userID int) ([]models.Comment, error) {
 	rows, err := database.DB.Query(`
-        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at, p.title
         FROM comments c
         JOIN users u ON c.user_id = u.id
+		JOIN posts p ON c.post_id = p.id
         WHERE c.user_id = ?
         ORDER BY c.created_at DESC
     `, userID)
@@ -57,10 +58,12 @@ func GetCommentsByUserID(userID int) ([]models.Comment, error) {
 	var comments []models.Comment
 	for rows.Next() {
 		var c models.Comment
-		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt)
+		var postTitle string
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt, &postTitle)
 		if err != nil {
 			return nil, err
 		}
+		c.PostTitle = postTitle
 		comments = append(comments, c)
 	}
 	return comments, nil

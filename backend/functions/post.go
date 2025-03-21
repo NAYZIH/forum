@@ -151,3 +151,63 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 	}
 	return posts, nil
 }
+
+func GetLikedPostsByUserID(userID int) ([]models.Post, error) {
+	rows, err := database.DB.Query(`
+        SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        JOIN post_likes pl ON p.id = pl.post_id
+        WHERE pl.user_id = ? AND pl.value = 1
+        ORDER BY pl.created_at DESC
+    `, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var posts []models.Post
+	for rows.Next() {
+		var p models.Post
+		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		cats, err := GetCategoriesByPostID(p.ID)
+		if err != nil {
+			return nil, err
+		}
+		p.Categories = cats
+		posts = append(posts, p)
+	}
+	return posts, nil
+}
+
+func GetDislikedPostsByUserID(userID int) ([]models.Post, error) {
+	rows, err := database.DB.Query(`
+        SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        JOIN post_likes pl ON p.id = pl.post_id
+        WHERE pl.user_id = ? AND pl.value = -1
+        ORDER BY pl.created_at DESC
+    `, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var posts []models.Post
+	for rows.Next() {
+		var p models.Post
+		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		cats, err := GetCategoriesByPostID(p.ID)
+		if err != nil {
+			return nil, err
+		}
+		p.Categories = cats
+		posts = append(posts, p)
+	}
+	return posts, nil
+}

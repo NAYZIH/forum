@@ -55,6 +55,16 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
+	likedPosts, err := functions.GetLikedPostsByUserID(targetUserID)
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+	dislikedPosts, err := functions.GetDislikedPostsByUserID(targetUserID)
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
 	var currentUserID int
 	sessionID, _ := r.Cookie("session_id")
 	if sessionID != nil {
@@ -69,22 +79,21 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		User         *models.User
-		Posts        []models.Post
-		Comments     []models.Comment
-		IsOwnProfile bool
+		User          *models.User
+		Posts         []models.Post
+		Comments      []models.Comment
+		LikedPosts    []models.Post
+		DislikedPosts []models.Post
+		IsOwnProfile  bool
 	}{
-		User:         targetUser,
-		Posts:        posts,
-		Comments:     comments,
-		IsOwnProfile: currentUserID == targetUserID,
+		User:          targetUser,
+		Posts:         posts,
+		Comments:      comments,
+		LikedPosts:    likedPosts,
+		DislikedPosts: dislikedPosts,
+		IsOwnProfile:  currentUserID == targetUserID,
 	}
 	t.Execute(w, data)
-}
-
-type EditProfileData struct {
-	User  *models.User
-	Error string
 }
 
 func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +118,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return
 		}
-		data := EditProfileData{
+		data := models.EditProfileData{
 			User: user,
 		}
 		t.Execute(w, data)
@@ -120,7 +129,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPassword))
 		if err != nil {
 			t, _ := template.ParseFiles("frontend/templates/editprofile.html")
-			data := EditProfileData{
+			data := models.EditProfileData{
 				User:  user,
 				Error: "Mot de passe actuel incorrect",
 			}
@@ -134,7 +143,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if exists {
 			t, _ := template.ParseFiles("frontend/templates/editprofile.html")
-			data := EditProfileData{
+			data := models.EditProfileData{
 				User:  user,
 				Error: "Email déjà pris",
 			}

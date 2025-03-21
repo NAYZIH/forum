@@ -14,6 +14,7 @@
     {{if .IsOwnProfile}}
         <p><a href="/profile/edit">Modifier le profil</a></p>
     {{end}}
+
     <h2>Publications</h2>
     {{range .Posts}}
         <div class="post">
@@ -27,16 +28,46 @@
     {{else}}
         <p>Aucune publication.</p>
     {{end}}
+
+    <h2>Publications aimées</h2>
+    {{range .LikedPosts}}
+        <div class="post">
+            <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
+            <p>Par <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
+            {{if .ImagePath}}
+                <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
+            {{end}}
+            <p>{{.Content}}</p>
+        </div>
+    {{else}}
+        <p>Aucune publication aimée.</p>
+    {{end}}
+
+    <h2>Publications non aimées</h2>
+    {{range .DislikedPosts}}
+        <div class="post">
+            <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
+            <p>Par <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
+            {{if .ImagePath}}
+                <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
+            {{end}}
+            <p>{{.Content}}</p>
+        </div>
+    {{else}}
+        <p>Aucune publication non aimée.</p>
+    {{end}}
+
     <h2>Commentaires</h2>
     {{range .Comments}}
         <div class="comment">
+            <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
             <p><strong>{{.Username}}</strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
-            <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostID}}</a></p>
         </div>
     {{else}}
         <p>Aucun commentaire.</p>
     {{end}}
+
     <p><a href="/">Retour à l'accueil</a></p>
 </body>
 </html>

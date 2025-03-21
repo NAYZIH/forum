@@ -11,4 +11,5 @@ type Comment struct {
 	CreatedAt time.Time
 	Likes     int
 	Dislikes  int
+	PostTitle string
 }
