@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditer un post</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Éditer un post</h1>
+    {{if .Error}}
+        <p style="color: red;">{{.Error}}</p>
+    {{end}}
+    <form method="POST" enctype="multipart/form-data">
+        <label for="title">Titre :</label><br>
+        <input type="text" id="title" name="title" value="{{.Post.Title}}" required><br><br>
+
+        <label for="content">Contenu :</label><br>
+        <textarea id="content" name="content" required>{{.Post.Content}}</textarea><br><br>
+
+        <label>Catégories :</label><br>
+        {{range .Categories}}
+            <input type="checkbox" name="categories[]" value="{{.}}" {{if in $.Post.Categories .}}checked{{end}}>
+            {{.}}<br>
+        {{end}}<br>
+
+        <label for="new_categories">Ajouter de nouvelles catégories (séparées par des virgules) :</label><br>
+        <input type="text" id="new_categories" name="new_categories"><br><br>
+
+        <label for="image">Image (facultatif) :</label><br>
+        {{if .Post.ImagePath}}
+            <p>Image actuelle : <img src="{{.Post.ImagePath}}" alt="Image du post" style="max-width: 200px;"></p>
+        {{end}}
+        <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif"><br><br>
+
+        <button type="submit">Mettre à jour</button>
+    </form>
+    <a href="/post/{{.Post.ID}}">Retour au post</a>
+</body>
+</html>

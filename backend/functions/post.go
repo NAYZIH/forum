@@ -1,3 +1,4 @@
+// backend/functions/post.go
 package functions
 
 import (
@@ -17,6 +18,52 @@ func CreatePost(userID int, title, content string, categories []string, imagePat
 		return err
 	}
 	postID, err := res.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	for _, cat := range categories {
+		if cat == "" {
+			continue
+		}
+		var catID int
+		err = tx.QueryRow("SELECT id FROM categories WHERE name = ?", cat).Scan(&catID)
+		if err == sql.ErrNoRows {
+			res, err := tx.Exec("INSERT INTO categories (name) VALUES (?)", cat)
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+			catID64, err := res.LastInsertId()
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+			catID = int(catID64)
+		} else if err != nil {
+			tx.Rollback()
+			return err
+		}
+		_, err = tx.Exec("INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)", postID, catID)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+func UpdatePost(postID int, title, content string, categories []string, imagePath string) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("UPDATE posts SET title = ?, content = ?, image_path = ? WHERE id = ?", title, content, imagePath, postID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM post_categories WHERE post_id = ?", postID)
 	if err != nil {
 		tx.Rollback()
 		return err

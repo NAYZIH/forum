@@ -282,6 +282,211 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		t.Execute(w, data)
+	} else if len(parts) == 2 && parts[1] == "edit" {
+		id, err := strconv.Atoi(parts[0])
+		if err != nil {
+			http.Error(w, "ID invalide", http.StatusBadRequest)
+			return
+		}
+		post, err := functions.GetPostByID(id)
+		if err != nil {
+			ErrorHandler(w, r, http.StatusNotFound)
+			return
+		}
+		sessionID, err := r.Cookie("session_id")
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		session, err := auth.GetSession(sessionID.Value)
+		if err != nil || session == nil || session.UserID != post.UserID {
+			http.Error(w, "Non autorisé", http.StatusUnauthorized)
+			return
+		}
+		if r.Method == "GET" {
+			categories, err := functions.GetAllCategories()
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			t, err := template.New("editpost.html").Funcs(template.FuncMap{
+				"in": func(slice []string, val string) bool {
+					for _, item := range slice {
+						if item == val {
+							return true
+						}
+					}
+					return false
+				},
+			}).ParseFiles("frontend/templates/editpost.html")
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			data := struct {
+				Post       *models.Post
+				Categories []string
+				Error      string
+			}{
+				Post:       post,
+				Categories: categories,
+				Error:      "",
+			}
+			t.Execute(w, data)
+		} else if r.Method == "POST" {
+			err := r.ParseMultipartForm(maxUploadSize)
+			if err != nil {
+				http.Error(w, "Fichier trop volumineux", http.StatusBadRequest)
+				return
+			}
+			title := r.FormValue("title")
+			content := r.FormValue("content")
+			selectedCategories := r.Form["categories[]"]
+			newCategoriesStr := r.FormValue("new_categories")
+			newCategories := strings.Split(newCategoriesStr, ",")
+			for i, cat := range newCategories {
+				newCategories[i] = strings.TrimSpace(cat)
+			}
+			var allCategories []string
+			for _, cat := range append(selectedCategories, newCategories...) {
+				if cat != "" {
+					allCategories = append(allCategories, cat)
+				}
+			}
+			if len(allCategories) == 0 {
+				categories, err := functions.GetAllCategories()
+				if err != nil {
+					ErrorHandler(w, r, http.StatusInternalServerError)
+					return
+				}
+				t, err := template.New("editpost.html").Funcs(template.FuncMap{
+					"in": func(slice []string, val string) bool {
+						for _, item := range slice {
+							if item == val {
+								return true
+							}
+						}
+						return false
+					},
+				}).ParseFiles("frontend/templates/editpost.html")
+				if err != nil {
+					ErrorHandler(w, r, http.StatusInternalServerError)
+					return
+				}
+				data := struct {
+					Post       *models.Post
+					Categories []string
+					Error      string
+				}{
+					Post:       post,
+					Categories: categories,
+					Error:      "Veuillez sélectionner ou créer au moins une catégorie.",
+				}
+				t.Execute(w, data)
+				return
+			}
+			file, handler, err := r.FormFile("image")
+			var imagePath string
+			if err == nil {
+				defer file.Close()
+				if handler.Size > maxUploadSize {
+					categories, err := functions.GetAllCategories()
+					if err != nil {
+						ErrorHandler(w, r, http.StatusInternalServerError)
+						return
+					}
+					t, err := template.New("editpost.html").Funcs(template.FuncMap{
+						"in": func(slice []string, val string) bool {
+							for _, item := range slice {
+								if item == val {
+									return true
+								}
+							}
+							return false
+						},
+					}).ParseFiles("frontend/templates/editpost.html")
+					if err != nil {
+						ErrorHandler(w, r, http.StatusInternalServerError)
+						return
+					}
+					data := struct {
+						Post       *models.Post
+						Categories []string
+						Error      string
+					}{
+						Post:       post,
+						Categories: categories,
+						Error:      "L'image est trop volumineuse (max 20 Mo).",
+					}
+					t.Execute(w, data)
+					return
+				}
+				ext := strings.ToLower(filepath.Ext(handler.Filename))
+				allowedExts := []string{".jpg", ".jpeg", ".png", ".gif"}
+				validExt := false
+				for _, allowed := range allowedExts {
+					if ext == allowed {
+						validExt = true
+						break
+					}
+				}
+				if !validExt {
+					categories, err := functions.GetAllCategories()
+					if err != nil {
+						ErrorHandler(w, r, http.StatusInternalServerError)
+						return
+					}
+					t, err := template.New("editpost.html").Funcs(template.FuncMap{
+						"in": func(slice []string, val string) bool {
+							for _, item := range slice {
+								if item == val {
+									return true
+								}
+							}
+							return false
+						},
+					}).ParseFiles("frontend/templates/editpost.html")
+					if err != nil {
+						ErrorHandler(w, r, http.StatusInternalServerError)
+						return
+					}
+					data := struct {
+						Post       *models.Post
+						Categories []string
+						Error      string
+					}{
+						Post:       post,
+						Categories: categories,
+						Error:      "Extension d'image non supportée (JPEG, PNG, GIF uniquement).",
+					}
+					t.Execute(w, data)
+					return
+				}
+				if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
+					ErrorHandler(w, r, http.StatusInternalServerError)
+					return
+				}
+				imagePath = uploadPath + strconv.FormatInt(time.Now().UnixNano(), 10) + ext
+				f, err := os.OpenFile(imagePath, os.O_WRONLY|os.O_CREATE, 0666)
+				if err != nil {
+					ErrorHandler(w, r, http.StatusInternalServerError)
+					return
+				}
+				defer f.Close()
+				io.Copy(f, file)
+				imagePath = "/static/images/posts/" + filepath.Base(imagePath)
+			} else {
+				imagePath = post.ImagePath // Conserver l'image existante si aucune nouvelle n'est uploadée
+			}
+			err = functions.UpdatePost(post.ID, title, content, allCategories, imagePath)
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			http.Redirect(w, r, "/post/"+strconv.Itoa(post.ID), http.StatusSeeOther)
+		} else {
+			http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+		}
 	} else if len(parts) == 2 && parts[1] == "comment" && r.Method == "POST" {
 		id, err := strconv.Atoi(parts[0])
 		if err != nil {
