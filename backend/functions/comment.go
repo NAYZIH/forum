@@ -140,3 +140,21 @@ func UpdateComment(commentID int, content, imagePath string) error {
 	_, err := database.DB.Exec("UPDATE comments SET content = ?, image_path = ? WHERE id = ?", content, imagePath, commentID)
 	return err
 }
+
+func DeleteComment(commentID int) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM comment_likes WHERE comment_id = ?", commentID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM comments WHERE id = ?", commentID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}

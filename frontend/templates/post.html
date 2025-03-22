@@ -51,6 +51,9 @@
                 </form>
                 {{if eq $.User.ID .UserID}}
                     <a href="/comment/{{.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
+                    <form action="/comment/{{.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
+                        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">Supprimer</button>
+                    </form>
                 {{end}}
             {{end}}
         </div>
