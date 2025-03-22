@@ -9,7 +9,7 @@
 <body>
     <h1>Forum</h1>
     {{if .User}}
-        <p>Bienvenue, <a href="/profile">{{.User.Username}}</a> | <a href="/post/new">Nouvelle publication</a> | 
+        <p>Bienvenue, <img src="{{.User.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile">{{.User.Username}}</a> | <a href="/post/new">Nouvelle publication</a> | 
         <form action="/logout" method="post" style="display:inline;">
             <button type="submit">Déconnexion</button>
         </form></p>
@@ -27,7 +27,7 @@
     {{range .Posts}}
         <div class="post">
             <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-            <p>Par <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
+            <p>Par <img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
             {{if .ImagePath}}
                 <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
             {{end}}

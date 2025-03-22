@@ -18,9 +18,9 @@ func CreateUser(email, username, password, bio string) error {
 }
 
 func GetUserByEmail(email string) (*models.User, error) {
-	row := database.DB.QueryRow("SELECT id, email, username, password, bio, created_at FROM users WHERE email = ?", email)
+	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, created_at FROM users WHERE email = ?", email)
 	user := &models.User{}
-	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +28,9 @@ func GetUserByEmail(email string) (*models.User, error) {
 }
 
 func GetUserByID(id int) (*models.User, error) {
-	row := database.DB.QueryRow("SELECT id, email, username, password, bio, created_at FROM users WHERE id = ?", id)
+	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, created_at FROM users WHERE id = ?", id)
 	user := &models.User{}
-	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -38,9 +38,9 @@ func GetUserByID(id int) (*models.User, error) {
 }
 
 func GetUserByEmailOrUsername(identifier string) (*models.User, error) {
-	row := database.DB.QueryRow("SELECT id, email, username, password, bio, created_at FROM users WHERE email = ? OR username = ?", identifier, identifier)
+	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, created_at FROM users WHERE email = ? OR username = ?", identifier, identifier)
 	user := &models.User{}
-	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -59,8 +59,8 @@ func Authenticate(identifier, password string) (*models.User, error) {
 	return user, nil
 }
 
-func UpdateUser(id int, username, email, bio string) error {
-	_, err := database.DB.Exec("UPDATE users SET username = ?, email = ?, bio = ? WHERE id = ?", username, email, bio, id)
+func UpdateUser(id int, username, email, bio, avatarPath string) error {
+	_, err := database.DB.Exec("UPDATE users SET username = ?, email = ?, bio = ?, avatar_path = ? WHERE id = ?", username, email, bio, avatarPath, id)
 	return err
 }
 

@@ -8,6 +8,7 @@
 </head>
 <body>
     <h1>Profil de {{.User.Username}}</h1>
+    <p><img src="{{.User.AvatarPath}}" alt="Avatar" style="max-width: 100px;"></p>
     <p><strong>Bio :</strong> {{.User.Bio}}</p>
     <p>Inscrit le : {{.User.CreatedAt}}</p>
     <p>Nombre de publications : {{len .Posts}}</p>
@@ -20,7 +21,7 @@
     {{range .Posts}}
         <div class="post">
             <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-            <p>Par {{.Username}} le {{.CreatedAt}}</p>
+            <p>Par <img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> {{.Username}} le {{.CreatedAt}}</p>
             {{if .ImagePath}}
                 <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
             {{end}}
@@ -34,7 +35,7 @@
     {{range .LikedPosts}}
         <div class="post">
             <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-            <p>Par <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
+            <p>Par <img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
             {{if .ImagePath}}
                 <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
             {{end}}
@@ -48,7 +49,7 @@
     {{range .DislikedPosts}}
         <div class="post">
             <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-            <p>Par <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
+            <p>Par <img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
             {{if .ImagePath}}
                 <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
             {{end}}
@@ -62,7 +63,7 @@
     {{range .Comments}}
         <div class="comment">
             <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
-            <p><strong>{{.Username}}</strong> le {{.CreatedAt}} :</p>
+            <p><strong><img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> {{.Username}}</strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
             {{if .ImagePath}}
                 <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
@@ -76,7 +77,7 @@
     {{range .LikedComments}}
         <div class="comment">
             <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
-            <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
+            <p><strong><img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
             {{if .ImagePath}}
                 <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
@@ -90,7 +91,7 @@
     {{range .DislikedComments}}
         <div class="comment">
             <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
-            <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
+            <p><strong><img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
             {{if .ImagePath}}
                 <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">

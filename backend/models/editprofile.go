@@ -1,6 +1,7 @@
 package models
 
 type EditProfileData struct {
-	User  *User
-	Error string
+	User    *User
+	Avatars []string
+	Error   string
 }

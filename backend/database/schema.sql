@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL,
     password TEXT NOT NULL,
     bio TEXT,
+    avatar_path TEXT DEFAULT '/static/images/profile/default.png',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -104,13 +104,13 @@ func UpdatePost(postID int, title, content string, categories []string, imagePat
 
 func GetPostByID(id int) (*models.Post, error) {
 	row := database.DB.QueryRow(`
-        SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+        SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
         FROM posts p
         JOIN users u ON p.user_id = u.id
         WHERE p.id = ?
     `, id)
 	post := &models.Post{}
-	err := row.Scan(&post.ID, &post.UserID, &post.Username, &post.Title, &post.Content, &post.ImagePath, &post.CreatedAt)
+	err := row.Scan(&post.ID, &post.UserID, &post.Username, &post.AvatarPath, &post.Title, &post.Content, &post.ImagePath, &post.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 	switch filter {
 	case "category":
 		query = `
-            SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+            SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
             FROM posts p
             JOIN users u ON p.user_id = u.id
             JOIN post_categories pc ON p.id = pc.post_id
@@ -147,7 +147,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 		args = []interface{}{category}
 	case "created":
 		query = `
-            SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+            SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
             FROM posts p
             JOIN users u ON p.user_id = u.id
             WHERE p.user_id = ?
@@ -156,7 +156,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 		args = []interface{}{userID}
 	case "liked":
 		query = `
-            SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+            SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
             FROM posts p
             JOIN users u ON p.user_id = u.id
             JOIN post_likes pl ON p.id = pl.post_id
@@ -166,7 +166,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 		args = []interface{}{userID}
 	default:
 		query = `
-            SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+            SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
             FROM posts p
             JOIN users u ON p.user_id = u.id
             ORDER BY p.created_at DESC
@@ -180,7 +180,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var p models.Post
-		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
+		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.AvatarPath, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -204,7 +204,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
 
 func GetLikedPostsByUserID(userID int) ([]models.Post, error) {
 	rows, err := database.DB.Query(`
-        SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+        SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
         FROM posts p
         JOIN users u ON p.user_id = u.id
         JOIN post_likes pl ON p.id = pl.post_id
@@ -218,7 +218,7 @@ func GetLikedPostsByUserID(userID int) ([]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var p models.Post
-		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
+		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.AvatarPath, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -234,7 +234,7 @@ func GetLikedPostsByUserID(userID int) ([]models.Post, error) {
 
 func GetDislikedPostsByUserID(userID int) ([]models.Post, error) {
 	rows, err := database.DB.Query(`
-        SELECT p.id, p.user_id, u.username, p.title, p.content, p.image_path, p.created_at
+        SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
         FROM posts p
         JOIN users u ON p.user_id = u.id
         JOIN post_likes pl ON p.id = pl.post_id
@@ -248,7 +248,7 @@ func GetDislikedPostsByUserID(userID int) ([]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var p models.Post
-		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
+		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.AvatarPath, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
 		if err != nil {
 			return nil, err
 		}

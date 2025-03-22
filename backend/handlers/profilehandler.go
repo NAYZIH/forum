@@ -6,6 +6,7 @@ import (
 	"forum/backend/models"
 	"html/template"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -127,13 +128,19 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "GET" {
+		avatars, err := getAvailableAvatars()
+		if err != nil {
+			ErrorHandler(w, r, http.StatusInternalServerError)
+			return
+		}
 		t, err := template.ParseFiles("frontend/templates/editprofile.html")
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return
 		}
 		data := models.EditProfileData{
-			User: user,
+			User:    user,
+			Avatars: avatars,
 		}
 		t.Execute(w, data)
 	} else if r.Method == "POST" {
@@ -141,12 +148,15 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		newUsername := r.FormValue("username")
 		newEmail := r.FormValue("email")
 		newBio := r.FormValue("bio")
+		newAvatar := r.FormValue("avatar")
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPassword))
 		if err != nil {
+			avatars, _ := getAvailableAvatars()
 			t, _ := template.ParseFiles("frontend/templates/editprofile.html")
 			data := models.EditProfileData{
-				User:  user,
-				Error: "Mot de passe actuel incorrect",
+				User:    user,
+				Avatars: avatars,
+				Error:   "Mot de passe actuel incorrect",
 			}
 			t.Execute(w, data)
 			return
@@ -157,15 +167,17 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if exists {
+			avatars, _ := getAvailableAvatars()
 			t, _ := template.ParseFiles("frontend/templates/editprofile.html")
 			data := models.EditProfileData{
-				User:  user,
-				Error: "Email déjà pris",
+				User:    user,
+				Avatars: avatars,
+				Error:   "Email déjà pris",
 			}
 			t.Execute(w, data)
 			return
 		}
-		err = functions.UpdateUser(user.ID, newUsername, newEmail, newBio)
+		err = functions.UpdateUser(user.ID, newUsername, newEmail, newBio, newAvatar)
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return
@@ -174,4 +186,19 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
+}
+
+func getAvailableAvatars() ([]string, error) {
+	dir := "./frontend/static/images/profile"
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	var avatars []string
+	for _, file := range files {
+		if !file.IsDir() {
+			avatars = append(avatars, "/static/images/profile/"+file.Name())
+		}
+	}
+	return avatars, nil
 }

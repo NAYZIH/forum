@@ -6,6 +6,7 @@ type Post struct {
 	ID         int
 	UserID     int
 	Username   string
+	AvatarPath string
 	Title      string
 	Content    string
 	ImagePath  string

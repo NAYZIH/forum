@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>{{.Post.Title}}</h1>
-    <p>Par <a href="/profile/{{.Post.UserID}}">{{.Post.Username}}</a> le {{.Post.CreatedAt}}</p>
+    <p>Par <img src="{{.Post.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.Post.UserID}}">{{.Post.Username}}</a> le {{.Post.CreatedAt}}</p>
     {{if .Post.ImagePath}}
         <img src="{{.Post.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
     {{end}}
@@ -34,7 +34,7 @@
     <h2>Commentaires</h2>
     {{range .Comments}}
         <div class="comment">
-            <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
+            <p><strong><img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
             {{if .ImagePath}}
                 <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
