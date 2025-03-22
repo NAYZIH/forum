@@ -503,8 +503,48 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
+		err = r.ParseMultipartForm(maxUploadSize)
+		if err != nil {
+			http.Error(w, "Fichier trop volumineux", http.StatusBadRequest)
+			return
+		}
 		content := r.FormValue("content")
-		err = functions.CreateComment(id, session.UserID, content)
+		file, handler, err := r.FormFile("image")
+		var imagePath string
+		if err == nil {
+			defer file.Close()
+			if handler.Size > maxUploadSize {
+				http.Error(w, "L'image est trop volumineuse (max 20 Mo).", http.StatusBadRequest)
+				return
+			}
+			ext := strings.ToLower(filepath.Ext(handler.Filename))
+			allowedExts := []string{".jpg", ".jpeg", ".png", ".gif"}
+			validExt := false
+			for _, allowed := range allowedExts {
+				if ext == allowed {
+					validExt = true
+					break
+				}
+			}
+			if !validExt {
+				http.Error(w, "Extension d'image non supportée (JPEG, PNG, GIF uniquement).", http.StatusBadRequest)
+				return
+			}
+			if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			imagePath = uploadPath + strconv.FormatInt(time.Now().UnixNano(), 10) + ext
+			f, err := os.OpenFile(imagePath, os.O_WRONLY|os.O_CREATE, 0666)
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			defer f.Close()
+			io.Copy(f, file)
+			imagePath = "/static/images/posts/" + filepath.Base(imagePath)
+		}
+		err = functions.CreateComment(id, session.UserID, content, imagePath)
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return

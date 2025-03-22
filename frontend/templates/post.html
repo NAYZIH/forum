@@ -36,6 +36,9 @@
         <div class="comment">
             <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
+            {{if .ImagePath}}
+                <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
+            {{end}}
             <p>Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>
             {{if $.User}}
                 <form action="/like/comment/{{.ID}}" method="post" style="display:inline;">
@@ -53,8 +56,10 @@
     {{end}}
     {{if .User}}
         <h3>Ajouter un commentaire</h3>
-        <form action="/post/{{.Post.ID}}/comment" method="post">
+        <form action="/post/{{.Post.ID}}/comment" method="post" enctype="multipart/form-data">
             <textarea name="content" placeholder="Ajouter un commentaire" required></textarea><br>
+            <label for="image">Image (facultatif) :</label>
+            <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif"><br>
             <button type="submit">Commenter</button>
         </form>
     {{end}}

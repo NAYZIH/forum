@@ -8,6 +8,7 @@ type Comment struct {
 	UserID    int
 	Username  string
 	Content   string
+	ImagePath string
 	CreatedAt time.Time
 	Likes     int
 	Dislikes  int

@@ -5,14 +5,14 @@ import (
 	"forum/backend/models"
 )
 
-func CreateComment(postID, userID int, content string) error {
-	_, err := database.DB.Exec("INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)", postID, userID, content)
+func CreateComment(postID, userID int, content, imagePath string) error {
+	_, err := database.DB.Exec("INSERT INTO comments (post_id, user_id, content, image_path) VALUES (?, ?, ?, ?)", postID, userID, content, imagePath)
 	return err
 }
 
 func GetCommentsByPostID(postID int) ([]models.Comment, error) {
 	rows, err := database.DB.Query(`
-        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.image_path, c.created_at
         FROM comments c
         JOIN users u ON c.user_id = u.id
         WHERE c.post_id = ?
@@ -25,7 +25,7 @@ func GetCommentsByPostID(postID int) ([]models.Comment, error) {
 	var comments []models.Comment
 	for rows.Next() {
 		var c models.Comment
-		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt)
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.ImagePath, &c.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -44,10 +44,10 @@ func GetCommentsByPostID(postID int) ([]models.Comment, error) {
 
 func GetCommentsByUserID(userID int) ([]models.Comment, error) {
 	rows, err := database.DB.Query(`
-        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at, p.title
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.image_path, c.created_at, p.title
         FROM comments c
         JOIN users u ON c.user_id = u.id
-		JOIN posts p ON c.post_id = p.id
+        JOIN posts p ON c.post_id = p.id
         WHERE c.user_id = ?
         ORDER BY c.created_at DESC
     `, userID)
@@ -59,7 +59,7 @@ func GetCommentsByUserID(userID int) ([]models.Comment, error) {
 	for rows.Next() {
 		var c models.Comment
 		var postTitle string
-		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt, &postTitle)
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.ImagePath, &c.CreatedAt, &postTitle)
 		if err != nil {
 			return nil, err
 		}
@@ -71,7 +71,7 @@ func GetCommentsByUserID(userID int) ([]models.Comment, error) {
 
 func GetLikedCommentsByUserID(userID int) ([]models.Comment, error) {
 	rows, err := database.DB.Query(`
-        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at, p.title
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.image_path, c.created_at, p.title
         FROM comments c
         JOIN users u ON c.user_id = u.id
         JOIN posts p ON c.post_id = p.id
@@ -86,7 +86,7 @@ func GetLikedCommentsByUserID(userID int) ([]models.Comment, error) {
 	var comments []models.Comment
 	for rows.Next() {
 		var c models.Comment
-		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt, &c.PostTitle)
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.ImagePath, &c.CreatedAt, &c.PostTitle)
 		if err != nil {
 			return nil, err
 		}
@@ -97,7 +97,7 @@ func GetLikedCommentsByUserID(userID int) ([]models.Comment, error) {
 
 func GetDislikedCommentsByUserID(userID int) ([]models.Comment, error) {
 	rows, err := database.DB.Query(`
-        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.created_at, p.title
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.image_path, c.created_at, p.title
         FROM comments c
         JOIN users u ON c.user_id = u.id
         JOIN posts p ON c.post_id = p.id
@@ -112,7 +112,7 @@ func GetDislikedCommentsByUserID(userID int) ([]models.Comment, error) {
 	var comments []models.Comment
 	for rows.Next() {
 		var c models.Comment
-		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.CreatedAt, &c.PostTitle)
+		err := rows.Scan(&c.ID, &c.PostID, &c.UserID, &c.Username, &c.Content, &c.ImagePath, &c.CreatedAt, &c.PostTitle)
 		if err != nil {
 			return nil, err
 		}

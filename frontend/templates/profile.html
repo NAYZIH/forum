@@ -63,6 +63,9 @@
             <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
             <p><strong>{{.Username}}</strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
+            {{if .ImagePath}}
+                <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
+            {{end}}
         </div>
     {{else}}
         <p>Aucun commentaire.</p>
@@ -74,6 +77,9 @@
             <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
             <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
+            {{if .ImagePath}}
+                <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
+            {{end}}
         </div>
     {{else}}
         <p>Aucun commentaire aimé.</p>
@@ -85,6 +91,9 @@
             <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
             <p><strong><a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
             <p>{{.Content}}</p>
+            {{if .ImagePath}}
+                <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
+            {{end}}
         </div>
     {{else}}
         <p>Aucun commentaire non aimé.</p>
