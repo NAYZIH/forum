@@ -37,3 +37,11 @@ func GetCategoriesByPostID(postID int) ([]string, error) {
 	}
 	return categories, nil
 }
+
+func DeleteOrphanCategories() error {
+	_, err := database.DB.Exec(`
+		DELETE FROM categories
+		WHERE id NOT IN (SELECT DISTINCT category_id FROM post_categories)
+	`)
+	return err
+}

@@ -95,7 +95,11 @@ func UpdatePost(postID int, title, content string, categories []string, imagePat
 			return err
 		}
 	}
-	return tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return DeleteOrphanCategories()
 }
 
 func GetPostByID(id int) (*models.Post, error) {
@@ -288,5 +292,9 @@ func DeletePost(postID int) error {
 		tx.Rollback()
 		return err
 	}
-	return tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return DeleteOrphanCategories()
 }
