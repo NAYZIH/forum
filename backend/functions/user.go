@@ -37,8 +37,18 @@ func GetUserByID(id int) (*models.User, error) {
 	return user, nil
 }
 
-func Authenticate(email, password string) (*models.User, error) {
-	user, err := GetUserByEmail(email)
+func GetUserByEmailOrUsername(identifier string) (*models.User, error) {
+	row := database.DB.QueryRow("SELECT id, email, username, password, created_at FROM users WHERE email = ? OR username = ?", identifier, identifier)
+	user := &models.User{}
+	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func Authenticate(identifier, password string) (*models.User, error) {
+	user, err := GetUserByEmailOrUsername(identifier)
 	if err != nil {
 		return nil, err
 	}

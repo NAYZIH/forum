@@ -54,9 +54,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		t.Execute(w, nil)
 	} else if r.Method == "POST" {
-		email := r.FormValue("email")
+		identifier := r.FormValue("identifier")
 		password := r.FormValue("password")
-		user, err := functions.Authenticate(email, password)
+		user, err := functions.Authenticate(identifier, password)
 		if err != nil {
 			http.Error(w, "Identifiants invalides", http.StatusUnauthorized)
 			return
