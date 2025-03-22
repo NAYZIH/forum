@@ -140,6 +140,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		currentPassword := r.FormValue("current_password")
 		newUsername := r.FormValue("username")
 		newEmail := r.FormValue("email")
+		newBio := r.FormValue("bio")
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPassword))
 		if err != nil {
 			t, _ := template.ParseFiles("frontend/templates/editprofile.html")
@@ -164,7 +165,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			t.Execute(w, data)
 			return
 		}
-		err = functions.UpdateUser(user.ID, newUsername, newEmail)
+		err = functions.UpdateUser(user.ID, newUsername, newEmail, newBio)
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return

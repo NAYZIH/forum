@@ -8,6 +8,7 @@
 </head>
 <body>
     <h1>Profil de {{.User.Username}}</h1>
+    <p><strong>Bio :</strong> {{.User.Bio}}</p>
     <p>Inscrit le : {{.User.CreatedAt}}</p>
     <p>Nombre de publications : {{len .Posts}}</p>
     <p>Nombre de commentaires : {{len .Comments}}</p>

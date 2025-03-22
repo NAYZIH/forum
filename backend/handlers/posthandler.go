@@ -26,6 +26,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		email := r.FormValue("email")
 		username := r.FormValue("username")
 		password := r.FormValue("password")
+		bio := r.FormValue("bio")
 		if email == "" || username == "" || password == "" {
 			http.Error(w, "Tous les champs sont requis", http.StatusBadRequest)
 			return
@@ -34,7 +35,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Email déjà pris", http.StatusConflict)
 			return
 		}
-		err := functions.CreateUser(email, username, password)
+		err := functions.CreateUser(email, username, password, bio)
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return

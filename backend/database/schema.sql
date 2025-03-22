@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE NOT NULL,
     username TEXT NOT NULL,
     password TEXT NOT NULL,
+    bio TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
