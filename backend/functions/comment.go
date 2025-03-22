@@ -120,3 +120,23 @@ func GetDislikedCommentsByUserID(userID int) ([]models.Comment, error) {
 	}
 	return comments, nil
 }
+
+func GetCommentByID(id int) (*models.Comment, error) {
+	row := database.DB.QueryRow(`
+        SELECT c.id, c.post_id, c.user_id, u.username, c.content, c.image_path, c.created_at
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.id = ?
+    `, id)
+	comment := &models.Comment{}
+	err := row.Scan(&comment.ID, &comment.PostID, &comment.UserID, &comment.Username, &comment.Content, &comment.ImagePath, &comment.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return comment, nil
+}
+
+func UpdateComment(commentID int, content, imagePath string) error {
+	_, err := database.DB.Exec("UPDATE comments SET content = ?, image_path = ? WHERE id = ?", content, imagePath, commentID)
+	return err
+}

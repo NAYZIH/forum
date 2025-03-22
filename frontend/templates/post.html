@@ -49,6 +49,9 @@
                     <input type="hidden" name="action" value="dislike">
                     <button type="submit">Dislike</button>
                 </form>
+                {{if eq $.User.ID .UserID}}
+                    <a href="/comment/{{.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
+                {{end}}
             {{end}}
         </div>
     {{else}}

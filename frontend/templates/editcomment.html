@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier le commentaire</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Modifier le commentaire</h1>
+    {{if .Error}}
+        <p style="color: red;">{{.Error}}</p>
+    {{end}}
+    <form method="POST" enctype="multipart/form-data">
+        <label for="content">Contenu :</label><br>
+        <textarea id="content" name="content" required>{{.Comment.Content}}</textarea><br><br>
+
+        <label for="image">Image (facultatif) :</label><br>
+        {{if .Comment.ImagePath}}
+            <p>Image actuelle : <img src="{{.Comment.ImagePath}}" alt="Image du commentaire" style="max-width: 200px;"></p>
+        {{end}}
+        <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif"><br><br>
+
+        <button type="submit">Mettre à jour</button>
+    </form>
+    <a href="/post/{{.Comment.PostID}}">Retour au post</a>
+</body>
+</html>
