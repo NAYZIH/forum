@@ -476,7 +476,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 				io.Copy(f, file)
 				imagePath = "/static/images/posts/" + filepath.Base(imagePath)
 			} else {
-				imagePath = post.ImagePath // Conserver l'image existante si aucune nouvelle n'est uploadée
+				imagePath = post.ImagePath
 			}
 			err = functions.UpdatePost(post.ID, title, content, allCategories, imagePath)
 			if err != nil {
@@ -510,6 +510,37 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		http.Redirect(w, r, "/post/"+parts[0], http.StatusSeeOther)
+	} else if len(parts) == 2 && parts[1] == "delete" && r.Method == "POST" {
+		id, err := strconv.Atoi(parts[0])
+		if err != nil {
+			http.Error(w, "ID invalide", http.StatusBadRequest)
+			return
+		}
+		sessionID, err := r.Cookie("session_id")
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		session, err := auth.GetSession(sessionID.Value)
+		if err != nil || session == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		post, err := functions.GetPostByID(id)
+		if err != nil {
+			ErrorHandler(w, r, http.StatusNotFound)
+			return
+		}
+		if session.UserID != post.UserID {
+			http.Error(w, "Non autorisé", http.StatusUnauthorized)
+			return
+		}
+		err = functions.DeletePost(id)
+		if err != nil {
+			ErrorHandler(w, r, http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
 		ErrorHandler(w, r, http.StatusNotFound)
 	}

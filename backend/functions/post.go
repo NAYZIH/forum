@@ -1,4 +1,3 @@
-// backend/functions/post.go
 package functions
 
 import (
@@ -257,4 +256,37 @@ func GetDislikedPostsByUserID(userID int) ([]models.Post, error) {
 		posts = append(posts, p)
 	}
 	return posts, nil
+}
+
+func DeletePost(postID int) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM comment_likes WHERE comment_id IN (SELECT id FROM comments WHERE post_id = ?)", postID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM comments WHERE post_id = ?", postID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM post_likes WHERE post_id = ?", postID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM post_categories WHERE post_id = ?", postID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM posts WHERE id = ?", postID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
 }

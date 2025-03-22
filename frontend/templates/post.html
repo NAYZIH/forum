@@ -1,4 +1,3 @@
-<!-- frontend/templates/post.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -27,6 +26,9 @@
         </form>
         {{if eq .User.ID .Post.UserID}}
             <a href="/post/{{.Post.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
+            <form action="/post/{{.Post.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
+                <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">Supprimer</button>
+            </form>
         {{end}}
     {{end}}
     <h2>Commentaires</h2>
