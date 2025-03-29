@@ -1,0 +1,214 @@
+body {
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+    color: #FFD700;
+}
+
+.header {
+    background: linear-gradient(to bottom, #1A2526, transparent), url('lol-header-bg.jpg') no-repeat center;
+    background-size: cover;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.logo {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    height: 45px;
+    margin-right: 15px;
+    margin-top: -5px;
+}
+
+.logo h1 {
+    color: #FFD700;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-shadow: 0 0 5px #00FFFF;
+    margin: 0;
+}
+
+.nav {
+    text-align: center;
+    width: 100%;
+}
+
+.nav a {
+    color: #FFFFFF;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-left: 10px;
+    font-size: 12px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav a:hover {
+    color: #FFD700;
+}
+
+.user-status {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.breadcrumb {
+    background: repeating-linear-gradient(45deg, #333333 0px, #333333 2px, #444444 2px, #444444 4px);
+    padding: 10px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.breadcrumb p {
+    color: #FFFFFF;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 0;
+}
+
+.breadcrumb a {
+    color: #A1A1FF;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: #FFD700;
+}
+
+.main-content {
+    background: repeating-linear-gradient(45deg, #111111 0px, #111111 2px, #222222 2px, #222222 4px);
+    padding: 20px;
+    width: 960px;
+    margin: 20px auto;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.login-form {
+    background-color: #000000;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.login-form h3 {
+    color: #FFD700;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 5px;
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    color: #FFFFFF;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group textarea {
+    width: 200px;
+    height: 25px;
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    margin: 0 auto;
+    display: block;
+}
+
+.form-group textarea {
+    height: 60px;
+}
+
+.login-form button {
+    background: linear-gradient(to bottom, #3366CC, #0033A0);
+    color: #FFFFFF;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: 1px solid #0033A0;
+    padding: 10px 20px;
+    margin: 10px auto;
+    cursor: pointer;
+    width: 148px;
+    height: 35px;
+    transition: background 0.3s ease;
+    display: block;
+}
+
+.login-form button:hover {
+    background: linear-gradient(to bottom, #0033A0, #3366CC);
+}
+
+.login-form p {
+    text-align: center;
+}
+
+a {
+    color: #A1A1FF;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #FFD700;
+}
+
+.footer {
+    background: repeating-linear-gradient(45deg, #333333 0px, #333333 2px, #444444 2px, #444444 4px);
+    padding: 10px;
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 12px;
+}
+
+.warning {
+    background-color: #FF0000;
+    color: #FFFFFF;
+    padding: 10px;
+    border: 1px solid #FFFFFF;
+    text-align: center;
+}
+
+.warning h2 {
+    color: #FFFFFF;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 0;
+}
+
+.warning p {
+    color: #FFFFFF;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.warning a {
+    color: #A1A1FF;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.warning a:hover {
+    color: #FFD700;
+}

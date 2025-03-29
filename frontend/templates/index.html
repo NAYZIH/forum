@@ -4,49 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forum - Accueil</title>
-    <link rel="stylesheet" href="/static/stylesheet/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/stylesheet/index.css">
 </head>
 <body>
-    <h1>Forum</h1>
-    {{if .User}}
-        <p>Bienvenue, <img src="{{.User.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile">{{.User.Username}}</a> | <a href="/post/new">Nouvelle publication</a> | 
-        <form action="/logout" method="post" style="display:inline;">
-            <button type="submit">Déconnexion</button>
-        </form></p>
-        <p>Filtres : 
-            {{range .Categories}}
-                <a href="/filter/category?category={{.}}">{{.}}</a> | 
+
+    <div class="header">
+        <div class="logo">
+            <img src="/static/images/lol-logo.png" alt="League of Legends Logo" class="logo-img">
+            <h1>FORUM</h1>
+        </div>
+        <div class="nav">
+            <a href="/">ACCEUIL</a>
+            <a href="/help">AIDE</a>
+            {{if not .User}}
+                <a href="/login">CONNEXION</a>
+                <a href="/register">INSCRIPTION</a>
             {{end}}
-            <a href="/filter/created">Mes publications</a> | 
-            <a href="/filter/liked">Publications aimées</a>
-        </p>
-    {{else}}
-        <p><a href="/login">Connexion</a> | <a href="/register">Inscription</a></p>
-    {{end}}
-    <h2>Publications</h2>
-    {{range .Posts}}
-        <div class="post">
-            <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-            <p>Par <img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
-            {{if .ImagePath}}
-                <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
-            {{end}}
-            <p>{{.Content}}</p>
-            <p>Catégories : {{range .Categories}}{{.}} {{end}}</p>
-            <p>Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>
-            {{if $.User}}
-                <form action="/like/post/{{.ID}}" method="post" style="display:inline;">
-                    <input type="hidden" name="action" value="like">
-                    <button type="submit">Like</button>
-                </form>
-                <form action="/like/post/{{.ID}}" method="post" style="display:inline;">
-                    <input type="hidden" name="action" value="dislike">
-                    <button type="submit">Dislike</button>
-                </form>
+        </div> 
+        <div class="user-status">
+            {{if .User}}
+                <div class="user-info">
+                    <img src="{{.User.AvatarPath}}" alt="Avatar" class="user-avatar">
+                    <span class="username"><a href="/profile">{{.User.Username}}</a></span>
+                </div>
+                <div class="user-actions">
+                    <a href="/post/new" class="new-post">Nouvelle publication</a>
+                    <form action="/logout" method="post" class="logout-form">
+                        <button type="submit" class="logout-button">Déconnexion</button>
+                    </form>
+                </div>
+            {{else}}
+                <div class="auth-buttons">
+                    <a href="/login" class="auth-button login-button">Connexion</a>
+                    <a href="/register" class="auth-button register-button">Inscription</a>
+                </div>
             {{end}}
         </div>
-    {{else}}
-        <p>Aucune publication.</p>
-    {{end}}
+    </div>
+
+    <div class="breadcrumb">
+        <p>BIENVENUE, {{if .User}}{{.User.Username}}{{else}}INVITÉ. <a href="/login">Connexion</a> ou <a href="/register">Inscription</a>{{end}}.</p>
+    </div>
+
+    <div class="main-content">
+        <h2>Publications</h2>
+        {{if .User}}
+            <p>Filtres : 
+                {{range .Categories}}
+                    <a href="/filter/category?category={{.}}">{{.}}</a> | 
+                {{end}}
+                <a href="/filter/created">Mes publications</a> | 
+                <a href="/filter/liked">Publications aimées</a>
+            </p>
+        {{end}}
+        {{range .Posts}}
+            <div class="post">
+                <div class="post-header">
+                    <div class="post-meta">
+                        <img src="{{.AvatarPath}}" alt="Avatar" class="post-avatar">
+                        <div class="post-meta-text">
+                            <a href="/profile/{{.UserID}}" class="post-username">{{.Username}}</a>
+                            <span class="post-date">{{.CreatedAt}}</span>
+                        </div>
+                    </div>
+                    <h3 class="post-title"><a href="/post/{{.ID}}">{{.Title}}</a></h3>
+                </div>
+                <hr class="separator">
+                {{if .ImagePath}}
+                    <img src="{{.ImagePath}}" alt="Image de la publication" class="post-image">
+                {{end}}
+                <div class="post-content">
+                    <p>{{.Content}}</p>
+                </div>
+                <p class="post-categories">Catégories : {{range .Categories}}{{.}} {{end}}</p>
+                <p class="post-likes">Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>
+                {{if $.User}}
+                    <div class="post-actions">
+                        <form action="/like/post/{{.ID}}" method="post">
+                            <input type="hidden" name="action" value="like">
+                            <button type="submit">Like</button>
+                        </form>
+                        <form action="/like/post/{{.ID}}" method="post">
+                            <input type="hidden" name="action" value="dislike">
+                            <button type="submit">Dislike</button>
+                        </form>
+                    </div>
+                {{end}}
+            </div>
+        {{else}}
+            <p>Aucune publication.</p>
+        {{end}}
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Forum League of Legends - Inspiré par Riot Games</p>
+    </div>
 </body>
 </html>

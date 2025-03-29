@@ -4,15 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion</title>
-    <link rel="stylesheet" href="/static/stylesheet/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/stylesheet/login.css">
 </head>
 <body>
-    <h1>Connexion</h1>
-    <form action="/login" method="post">
-        <label>Votre Nom ou Email : <input type="text" name="identifier" required></label><br>
-        <label>Mot de passe : <input type="password" name="password" required></label><br>
-        <button type="submit">Se connecter</button>
-    </form>
-    <p><a href="/register">Pas de compte ? Inscrivez-vous</a></p>
+
+    <div class="header">
+        <div class="logo">
+            <img src="static/images/lol-logo.png" alt="League of Legends Logo" class="logo-img">
+            <h1>FORUM</h1>
+        </div>
+            <div class="nav">
+                <a href="/">ACCEUIL</a>
+                <a href="/help">AIDE</a>
+                <a href="/login">CONNEXION</a>
+                <a href="/register">INSCRIPTION</a>
+            </div>
+            <div class="user-status">
+            </div>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <p>BIENVENUE, INVITÉ. <a href="/login">Connexion</a> ou <a href="/register">Inscription</a>.</p>
+    </div>
+
+    <div class="main-content">
+        <div class="warning">
+            <h2>ATTENTION!</h2>
+            <p>SEULS LES MEMBRES ENREGISTRÉS SONT AUTORISÉS À ACCÉDER À CETTE SECTION.</p>
+        </div>
+
+        <div class="login-form">
+            <h3>Connexion</h3>
+            <form action="/login" method="post">
+                <div class="form-group">
+                    <label>Votre Nom ou Email : </label>
+                    <input type="text" name="identifier" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe : </label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit">Se connecter</button>
+            </form>
+            <p><a href="/register">Pas de compte ? Inscrivez-vous</a></p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Forum League of Legends - Inspiré par Riot Games</p>
+    </div>
 </body>
 </html>
