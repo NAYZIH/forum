@@ -4,71 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Post.Title}}</title>
-    <link rel="stylesheet" href="/static/stylesheet/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/stylesheet/post.css">
 </head>
 <body>
-    <h1>{{.Post.Title}}</h1>
-    <p>Par <img src="{{.Post.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.Post.UserID}}">{{.Post.Username}}</a> le {{.Post.CreatedAt}}</p>
-    {{if .Post.ImagePath}}
-        <img src="{{.Post.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
-    {{end}}
-    <p>{{.Post.Content}}</p>
-    <p>Catégories : {{range .Post.Categories}}{{.}} {{end}}</p>
-    <p>Likes : {{.Post.Likes}} | Dislikes : {{.Post.Dislikes}}</p>
-    {{if .User}}
-        <form action="/like/post/{{.Post.ID}}" method="post" style="display:inline;">
-            <input type="hidden" name="action" value="like">
-            <button type="submit">Like</button>
-        </form>
-        <form action="/like/post/{{.Post.ID}}" method="post" style="display:inline;">
-            <input type="hidden" name="action" value="dislike">
-            <button type="submit">Dislike</button>
-        </form>
-        {{if eq .User.ID .Post.UserID}}
-            <a href="/post/{{.Post.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
-            <form action="/post/{{.Post.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
-                <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">Supprimer</button>
-            </form>
-        {{end}}
-    {{end}}
-    <h2>Commentaires</h2>
-    {{range .Comments}}
-        <div class="comment">
-            <p><strong><img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
-            <p>{{.Content}}</p>
-            {{if .ImagePath}}
-                <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
-            {{end}}
-            <p>Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>
-            {{if $.User}}
-                <form action="/like/comment/{{.ID}}" method="post" style="display:inline;">
-                    <input type="hidden" name="action" value="like">
-                    <button type="submit">Like</button>
-                </form>
-                <form action="/like/comment/{{.ID}}" method="post" style="display:inline;">
-                    <input type="hidden" name="action" value="dislike">
-                    <button type="submit">Dislike</button>
-                </form>
-                {{if eq $.User.ID .UserID}}
-                    <a href="/comment/{{.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
-                    <form action="/comment/{{.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
-                        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">Supprimer</button>
-                    </form>
-                {{end}}
+    <div class="header">
+        <div class="logo">
+            <img src="/static/images/lol-logo.png" alt="League of Legends Logo" class="logo-img">
+            <h1>FORUM</h1>
+        </div>
+        <div class="nav">
+            <a href="/">ACCEUIL</a>
+            <a href="/help">AIDE</a>
+            {{if not .User}}
+                <a href="/login">CONNEXION</a>
+                <a href="/register">INSCRIPTION</a>
             {{end}}
         </div>
-    {{else}}
-        <p>Aucun commentaire.</p>
-    {{end}}
-    {{if .User}}
-        <h3>Ajouter un commentaire</h3>
-        <form action="/post/{{.Post.ID}}/comment" method="post" enctype="multipart/form-data">
-            <textarea name="content" placeholder="Ajouter un commentaire" required></textarea><br>
-            <label for="image">Image (facultatif) :</label>
-            <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif"><br>
-            <button type="submit">Commenter</button>
-        </form>
-    {{end}}
-    <p><a href="/">Retour à l'accueil</a></p>
+        <div class="user-status">
+            {{if .User}}
+                <div class="user-info">
+                    <img src="{{.User.AvatarPath}}" alt="Avatar" class="user-avatar">
+                    <span class="username"><a href="/profile">{{.User.Username}}</a></span>
+                </div>
+                <div class="user-actions">
+                    <a href="/post/new" class="new-post">Nouvelle publication</a>
+                    <form action="/logout" method="post" class="logout-form">
+                        <button type="submit" class="logout-button">Déconnexion</button>
+                    </form>
+                </div>
+            {{else}}
+                <div class="auth-buttons">
+                    <a href="/login" class="auth-button login-button">Connexion</a>
+                    <a href="/register" class="auth-button register-button">Inscription</a>
+                </div>
+            {{end}}
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <p>{{.Post.Title}}</p>
+    </div>
+
+    <div class="main-content">
+        <div class="post">
+            <div class="post-header">
+                <div class="post-meta">
+                    <img src="{{.Post.AvatarPath}}" alt="Avatar" class="post-avatar">
+                    <div class="post-meta-text">
+                        <a href="/profile/{{.Post.UserID}}" class="post-username">{{.Post.Username}}</a>
+                        <span class="post-date">{{.Post.CreatedAt}}</span>
+                    </div>
+                </div>
+                <h3 class="post-title">{{.Post.Title}}</h3>
+            </div>
+            <hr class="separator">
+            {{if .Post.ImagePath}}
+                <img src="{{.Post.ImagePath}}" alt="Image de la publication" class="post-image">
+            {{end}}
+            <div class="post-content">
+                <p>{{.Post.Content}}</p>
+                <p>Catégories : {{range .Post.Categories}}{{.}} {{end}}</p>
+                <p>Likes : {{.Post.Likes}} | Dislikes : {{.Post.Dislikes}}</p>
+                {{if .User}}
+                    <form action="/like/post/{{.Post.ID}}" method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="like">
+                        <button type="submit">Like</button>
+                    </form>
+                    <form action="/like/post/{{.Post.ID}}" method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="dislike">
+                        <button type="submit">Dislike</button>
+                    </form>
+                    {{if eq .User.ID .Post.UserID}}
+                        <a href="/post/{{.Post.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
+                        <form action="/post/{{.Post.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
+                            <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">Supprimer</button>
+                        </form>
+                    {{end}}
+                {{end}}
+            </div>
+        </div>
+
+        <h2>Commentaires</h2>
+        {{range .Comments}}
+            <div class="comment">
+                <div class="comment-header">
+                    <div class="comment-meta">
+                        <img src="{{.AvatarPath}}" alt="Avatar" class="comment-avatar">
+                        <div class="comment-meta-text">
+                            <a href="/profile/{{.UserID}}" class="comment-username">{{.Username}}</a>
+                            <span class="comment-date">{{.CreatedAt}}</span>
+                        </div>
+                    </div>
+                </div>
+                <hr class="separator">
+                {{if .ImagePath}}
+                    <img src="{{.ImagePath}}" alt="Image du commentaire" class="comment-image">
+                {{end}}
+                <div class="comment-content">
+                    <p>{{.Content}}</p>
+                    <p>Likes : {{.Likes}} | Dislikes : {{.Dislikes}}</p>
+                    {{if $.User}}
+                        <form action="/like/comment/{{.ID}}" method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="like">
+                            <button type="submit">Like</button>
+                        </form>
+                        <form action="/like/comment/{{.ID}}" method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="dislike">
+                            <button type="submit">Dislike</button>
+                        </form>
+                        {{if eq $.User.ID .UserID}}
+                            <a href="/comment/{{.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
+                            <form action="/comment/{{.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
+                                <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">Supprimer</button>
+                            </form>
+                        {{end}}
+                    {{end}}
+                </div>
+            </div>
+        {{else}}
+            <p>Aucun commentaire.</p>
+        {{end}}
+
+        {{if .User}}
+            <h3>Ajouter un commentaire</h3>
+            <form action="/post/{{.Post.ID}}/comment" method="post" enctype="multipart/form-data">
+                <textarea name="content" placeholder="Ajouter un commentaire" required></textarea><br>
+                <label for="image">Image (facultatif) :</label>
+                <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif"><br>
+                <button type="submit">Commenter</button>
+            </form>
+        {{end}}
+
+        <p><a href="/">Retour à l'accueil</a></p>
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Forum League of Legends - Inspiré par Riot Games</p>
+    </div>
 </body>
 </html>

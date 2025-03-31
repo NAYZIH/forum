@@ -1,106 +1,220 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil de {{.User.Username}}</title>
-    <link rel="stylesheet" href="/static/stylesheet/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil de {{.User.Username}}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/stylesheet/profile.css">
 </head>
 <body>
-    <h1>Profil de {{.User.Username}}</h1>
-    <p><img src="{{.User.AvatarPath}}" alt="Avatar" style="max-width: 100px;"></p>
-    <p><strong>Bio :</strong> {{.User.Bio}}</p>
-    <p>Inscrit le : {{.User.CreatedAt}}</p>
-    <p>Nombre de publications : {{len .Posts}}</p>
-    <p>Nombre de commentaires : {{len .Comments}}</p>
-    {{if .IsOwnProfile}}
-        <p><a href="/profile/edit">Modifier le profil</a></p>
-    {{end}}
+
+  <div class="header">
+    <div class="logo">
+      <img src="/static/images/lol-logo.png" alt="League of Legends Logo" class="logo-img">
+      <h1>FORUM</h1>
+    </div>
+    <div class="nav">
+      <a href="/">ACCEUIL</a>
+      <a href="/help">AIDE</a>
+      {{if not .User}}
+        <a href="/login">CONNEXION</a>
+        <a href="/register">INSCRIPTION</a>
+      {{end}}
+    </div>
+    <div class="user-status">
+      {{if .User}}
+        <div class="user-info">
+          <img src="{{.User.AvatarPath}}" alt="Avatar" class="user-avatar">
+          <span class="username"><a href="/profile">{{.User.Username}}</a></span>
+        </div>
+        <div class="user-actions">
+          <a href="/post/new" class="new-post">Nouvelle publication</a>
+          <form action="/logout" method="post" class="logout-form">
+            <button type="submit" class="logout-button">Déconnexion</button>
+          </form>
+        </div>
+      {{else}}
+        <div class="auth-buttons">
+          <a href="/login" class="auth-button login-button">Connexion</a>
+          <a href="/register" class="auth-button register-button">Inscription</a>
+        </div>
+      {{end}}
+    </div>
+  </div>
+
+  <div class="breadcrumb">
+    <p>Profil de {{.User.Username}}</p>
+  </div>
+
+  <div class="main-content">
+    <h2>Profil de {{.User.Username}}</h2>
+    <div class="profile-info">
+      <img src="{{.User.AvatarPath}}" alt="Avatar" class="user-avatar-large" style="max-width:100px;">
+      <p><strong>Bio :</strong> {{.User.Bio}}</p>
+      <p>Inscrit le : {{.User.CreatedAt}}</p>
+      <p>Nombre de publications : {{len .Posts}}</p>
+      <p>Nombre de commentaires : {{len .Comments}}</p>
+      {{if .IsOwnProfile}}
+        <p><a href="/profile/edit" class="edit-profile">Modifier le profil</a></p>
+      {{end}}
+    </div>
 
     <h2>Publications</h2>
     {{range .Posts}}
-        <div class="post">
-            <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-            <p>Par <img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> {{.Username}} le {{.CreatedAt}}</p>
-            {{if .ImagePath}}
-                <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
-            {{end}}
-            <p>{{.Content}}</p>
+      <div class="post">
+        <div class="post-header">
+          <div class="post-meta">
+            <img src="{{.AvatarPath}}" alt="Avatar" class="post-avatar">
+            <div class="post-meta-text">
+              <a href="/profile/{{.UserID}}" class="post-username">{{.Username}}</a>
+              <span class="post-date">{{.CreatedAt}}</span>
+            </div>
+          </div>
+          <h3 class="post-title"><a href="/post/{{.ID}}">{{.Title}}</a></h3>
         </div>
+        <hr class="separator">
+        {{if .ImagePath}}
+          <img src="{{.ImagePath}}" alt="Image de la publication" class="post-image">
+        {{end}}
+        <div class="post-content">
+          <p>{{.Content}}</p>
+        </div>
+      </div>
     {{else}}
-        <p>Aucune publication.</p>
+      <p>Aucune publication.</p>
     {{end}}
 
     <h2>Publications aimées</h2>
     {{range .LikedPosts}}
-        <div class="post">
-            <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-            <p>Par <img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
-            {{if .ImagePath}}
-                <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
-            {{end}}
-            <p>{{.Content}}</p>
+      <div class="post">
+        <div class="post-header">
+          <div class="post-meta">
+            <img src="{{.AvatarPath}}" alt="Avatar" class="post-avatar">
+            <div class="post-meta-text">
+              <a href="/profile/{{.UserID}}" class="post-username">{{.Username}}</a>
+              <span class="post-date">{{.CreatedAt}}</span>
+            </div>
+          </div>
+          <h3 class="post-title"><a href="/post/{{.ID}}">{{.Title}}</a></h3>
         </div>
+        <hr class="separator">
+        {{if .ImagePath}}
+          <img src="{{.ImagePath}}" alt="Image de la publication" class="post-image">
+        {{end}}
+        <div class="post-content">
+          <p>{{.Content}}</p>
+        </div>
+      </div>
     {{else}}
-        <p>Aucune publication aimée.</p>
+      <p>Aucune publication aimée.</p>
     {{end}}
 
     <h2>Publications non aimées</h2>
     {{range .DislikedPosts}}
-        <div class="post">
-            <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
-            <p>Par <img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a> le {{.CreatedAt}}</p>
-            {{if .ImagePath}}
-                <img src="{{.ImagePath}}" alt="Image de la publication" style="max-width: 100%;">
-            {{end}}
-            <p>{{.Content}}</p>
+      <div class="post">
+        <div class="post-header">
+          <div class="post-meta">
+            <img src="{{.AvatarPath}}" alt="Avatar" class="post-avatar">
+            <div class="post-meta-text">
+              <a href="/profile/{{.UserID}}" class="post-username">{{.Username}}</a>
+              <span class="post-date">{{.CreatedAt}}</span>
+            </div>
+          </div>
+          <h3 class="post-title"><a href="/post/{{.ID}}">{{.Title}}</a></h3>
         </div>
+        <hr class="separator">
+        {{if .ImagePath}}
+          <img src="{{.ImagePath}}" alt="Image de la publication" class="post-image">
+        {{end}}
+        <div class="post-content">
+          <p>{{.Content}}</p>
+        </div>
+      </div>
     {{else}}
-        <p>Aucune publication non aimée.</p>
+      <p>Aucune publication non aimée.</p>
     {{end}}
 
     <h2>Commentaires</h2>
     {{range .Comments}}
-        <div class="comment">
-            <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
-            <p><strong><img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> {{.Username}}</strong> le {{.CreatedAt}} :</p>
-            <p>{{.Content}}</p>
-            {{if .ImagePath}}
-                <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
-            {{end}}
+      <div class="comment">
+        <div class="comment-header">
+          <div class="comment-meta">
+            <img src="{{.AvatarPath}}" alt="Avatar" class="comment-avatar">
+            <div class="comment-meta-text">
+              <a href="/profile/{{.UserID}}" class="comment-username">{{.Username}}</a>
+              <span class="comment-date">{{.CreatedAt}}</span>
+            </div>
+          </div>
+          <h3 class="comment-post-title">Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></h3>
         </div>
+        <hr class="separator">
+        {{if .ImagePath}}
+          <img src="{{.ImagePath}}" alt="Image du commentaire" class="comment-image">
+        {{end}}
+        <div class="comment-content">
+          <p>{{.Content}}</p>
+        </div>
+      </div>
     {{else}}
-        <p>Aucun commentaire.</p>
+      <p>Aucun commentaire.</p>
     {{end}}
 
     <h2>Commentaires aimés</h2>
     {{range .LikedComments}}
-        <div class="comment">
-            <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
-            <p><strong><img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
-            <p>{{.Content}}</p>
-            {{if .ImagePath}}
-                <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
-            {{end}}
+      <div class="comment">
+        <div class="comment-header">
+          <div class="comment-meta">
+            <img src="{{.AvatarPath}}" alt="Avatar" class="comment-avatar">
+            <div class="comment-meta-text">
+              <a href="/profile/{{.UserID}}" class="comment-username">{{.Username}}</a>
+              <span class="comment-date">{{.CreatedAt}}</span>
+            </div>
+          </div>
+          <h3 class="comment-post-title">Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></h3>
         </div>
+        <hr class="separator">
+        {{if .ImagePath}}
+          <img src="{{.ImagePath}}" alt="Image du commentaire" class="comment-image">
+        {{end}}
+        <div class="comment-content">
+          <p>{{.Content}}</p>
+        </div>
+      </div>
     {{else}}
-        <p>Aucun commentaire aimé.</p>
+      <p>Aucun commentaire aimé.</p>
     {{end}}
 
     <h2>Commentaires non aimés</h2>
     {{range .DislikedComments}}
-        <div class="comment">
-            <p>Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></p>
-            <p><strong><img src="{{.AvatarPath}}" alt="Avatar" style="width: 20px; height: 20px; vertical-align: middle;"> <a href="/profile/{{.UserID}}">{{.Username}}</a></strong> le {{.CreatedAt}} :</p>
-            <p>{{.Content}}</p>
-            {{if .ImagePath}}
-                <img src="{{.ImagePath}}" alt="Image du commentaire" style="max-width: 100%;">
-            {{end}}
+      <div class="comment">
+        <div class="comment-header">
+          <div class="comment-meta">
+            <img src="{{.AvatarPath}}" alt="Avatar" class="comment-avatar">
+            <div class="comment-meta-text">
+              <a href="/profile/{{.UserID}}" class="comment-username">{{.Username}}</a>
+              <span class="comment-date">{{.CreatedAt}}</span>
+            </div>
+          </div>
+          <h3 class="comment-post-title">Sur la publication : <a href="/post/{{.PostID}}">{{.PostTitle}}</a></h3>
         </div>
+        <hr class="separator">
+        {{if .ImagePath}}
+          <img src="{{.ImagePath}}" alt="Image du commentaire" class="comment-image">
+        {{end}}
+        <div class="comment-content">
+          <p>{{.Content}}</p>
+        </div>
+      </div>
     {{else}}
-        <p>Aucun commentaire non aimé.</p>
+      <p>Aucun commentaire non aimé.</p>
     {{end}}
-    
+
     <p><a href="/">Retour à l'accueil</a></p>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 Forum League of Legends - Inspiré par Riot Games</p>
+  </div>
 </body>
 </html>
