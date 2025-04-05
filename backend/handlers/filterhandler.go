@@ -47,14 +47,16 @@ func FilterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		User       *models.User
-		Posts      []models.Post
-		Categories []string
+		User        *models.User
+		Posts       []models.Post
+		Categories  []string
+		UnreadCount int
 	}{
 		Posts: posts,
 	}
 	if userID != 0 {
 		data.User, _ = functions.GetUserByID(userID)
+		data.UnreadCount, _ = functions.GetUnreadNotificationCount(userID)
 	}
 	data.Categories, _ = functions.GetAllCategories()
 	t.Execute(w, data)
