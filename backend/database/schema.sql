@@ -71,3 +71,18 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    post_id INTEGER,
+    comment_id INTEGER,
+    from_user_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_read INTEGER DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (post_id) REFERENCES posts(id),
+    FOREIGN KEY (comment_id) REFERENCES comments(id),
+    FOREIGN KEY (from_user_id) REFERENCES users(id)
+);

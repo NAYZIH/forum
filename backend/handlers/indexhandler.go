@@ -17,11 +17,13 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	sessionID, _ := r.Cookie("session_id")
 	var user *models.User
 	var userID int
+	var unreadCount int
 	if sessionID != nil {
 		session, err := auth.GetSession(sessionID.Value)
 		if err == nil && session != nil {
 			user, _ = functions.GetUserByID(session.UserID)
 			userID = session.UserID
+			unreadCount, _ = functions.GetUnreadNotificationCount(userID)
 		}
 	}
 	posts, err := functions.GetPosts("", "", userID)
@@ -41,13 +43,15 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := struct {
-		User       *models.User
-		Posts      []models.Post
-		Categories []string
+		User        *models.User
+		Posts       []models.Post
+		Categories  []string
+		UnreadCount int
 	}{
-		User:       user,
-		Posts:      posts,
-		Categories: categories,
+		User:        user,
+		Posts:       posts,
+		Categories:  categories,
+		UnreadCount: unreadCount,
 	}
 	t.Execute(w, data)
 }

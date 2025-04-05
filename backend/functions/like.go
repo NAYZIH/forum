@@ -27,10 +27,46 @@ func GetCommentLikeValue(userID, commentID int) (int, error) {
 	return value, nil
 }
 
+func createNotification(userID, fromUserID int, notificationType string, postID, commentID *int) error {
+	var pID, cID sql.NullInt64
+	if postID != nil {
+		pID = sql.NullInt64{Int64: int64(*postID), Valid: true}
+	}
+	if commentID != nil {
+		cID = sql.NullInt64{Int64: int64(*commentID), Valid: true}
+	}
+	_, err := database.DB.Exec(`
+		INSERT INTO notifications (user_id, type, post_id, comment_id, from_user_id)
+		VALUES (?, ?, ?, ?, ?)`,
+		userID, notificationType, pID, cID, fromUserID)
+	return err
+}
+
 func LikePost(userID, postID int, action string) error {
 	currentValue, err := GetPostLikeValue(userID, postID)
 	if err != nil {
 		return err
+	}
+
+	var postOwnerID int
+	err = database.DB.QueryRow("SELECT user_id FROM posts WHERE id = ?", postID).Scan(&postOwnerID)
+	if err != nil {
+		return err
+	}
+
+	if userID != postOwnerID {
+		var notificationType string
+		if action == "like" {
+			notificationType = "like_post"
+		} else if action == "dislike" {
+			notificationType = "dislike_post"
+		}
+		if currentValue == 0 {
+			err = createNotification(postOwnerID, userID, notificationType, &postID, nil)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	if action == "like" {
@@ -57,6 +93,27 @@ func LikeComment(userID, commentID int, action string) error {
 	currentValue, err := GetCommentLikeValue(userID, commentID)
 	if err != nil {
 		return err
+	}
+
+	var commentOwnerID int
+	err = database.DB.QueryRow("SELECT user_id FROM comments WHERE id = ?", commentID).Scan(&commentOwnerID)
+	if err != nil {
+		return err
+	}
+
+	if userID != commentOwnerID {
+		var notificationType string
+		if action == "like" {
+			notificationType = "like_comment"
+		} else if action == "dislike" {
+			notificationType = "dislike_comment"
+		}
+		if currentValue == 0 {
+			err = createNotification(commentOwnerID, userID, notificationType, nil, &commentID)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	if action == "like" {

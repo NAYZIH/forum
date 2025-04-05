@@ -6,8 +6,24 @@ import (
 )
 
 func CreateComment(postID, userID int, content, imagePath string) error {
-	_, err := database.DB.Exec("INSERT INTO comments (post_id, user_id, content, image_path) VALUES (?, ?, ?, ?)", postID, userID, content, imagePath)
-	return err
+	var postOwnerID int
+	err := database.DB.QueryRow("SELECT user_id FROM posts WHERE id = ?", postID).Scan(&postOwnerID)
+	if err != nil {
+		return err
+	}
+
+	_, err = database.DB.Exec("INSERT INTO comments (post_id, user_id, content, image_path) VALUES (?, ?, ?, ?)", postID, userID, content, imagePath)
+	if err != nil {
+		return err
+	}
+
+	if userID != postOwnerID {
+		err = createNotification(postOwnerID, userID, "comment", &postID, nil)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func GetCommentsByPostID(postID int) ([]models.Comment, error) {

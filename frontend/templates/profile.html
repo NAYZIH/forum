@@ -29,6 +29,7 @@
           <span class="username"><a href="/profile">{{.User.Username}}</a></span>
         </div>
         <div class="user-actions">
+          <a href="/notification" class="notification-button">Notifications{{if gt .UnreadCount 0}}<span class="notification-count">{{.UnreadCount}}</span>{{end}}</a>
           <a href="/post/new" class="new-post">Nouvelle publication</a>
           <form action="/logout" method="post" class="logout-form">
             <button type="submit" class="logout-button">Déconnexion</button>

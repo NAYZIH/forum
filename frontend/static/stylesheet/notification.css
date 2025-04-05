@@ -12,16 +12,6 @@ h1, h2, h3 {
     color: #FFD700;
 }
 
-a {
-    color: #A1A1FF;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: #FFD700;
-}
-
 .header {
     background: linear-gradient(to bottom, #1A2526, transparent), url('lol-header-bg.jpg') no-repeat center;
     background-size: cover;
@@ -30,20 +20,6 @@ a:hover {
     align-items: center;
     justify-content: center;
     position: relative;
-}
-
-.breadcrumb {
-    background: repeating-linear-gradient(45deg, #333333 0px, #333333 2px, #444444 2px, #444444 4px);
-    padding: 10px;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.breadcrumb p {
-    color: #FFFFFF;
-    text-transform: uppercase;
-    font-weight: bold;
-    margin: 0;
 }
 
 .logo {
@@ -124,7 +100,7 @@ a:hover {
 }
 
 .notification-button {
-    background: linear-gradient(to bottom, #FF8C00, #FF4500);
+    background: linear-gradient(to bottom, #33CC33, #00A000);
     padding: 5px 10px;
     border-radius: 3px;
     font-size: 12px;
@@ -135,7 +111,7 @@ a:hover {
 }
 
 .notification-button:hover {
-    background: linear-gradient(to bottom, #FF4500, #FF8C00);
+    background: linear-gradient(to bottom, #00A000, #33CC33);
 }
 
 .notification-count {
@@ -206,6 +182,20 @@ a:hover {
     background: linear-gradient(to bottom, #0033A0, #3366CC);
 }
 
+.breadcrumb {
+    background: repeating-linear-gradient(45deg, #333333 0px, #333333 2px, #444444 2px, #444444 4px);
+    padding: 10px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.breadcrumb p {
+    color: #FFFFFF;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 0;
+}
+
 .main-content {
     background: repeating-linear-gradient(45deg, #111111 0px, #111111 2px, #222222 2px, #222222 4px);
     padding: 20px;
@@ -216,171 +206,35 @@ a:hover {
     text-align: center;
 }
 
-.post {
+.notification {
     background-color: #000000;
-    padding: 20px;
-    margin: 20px auto;
+    padding: 15px;
+    margin: 10px auto;
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(255,215,0,0.5);
     max-width: 800px;
     text-align: left;
 }
 
-.post-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-.post-meta {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-}
-
-.post-avatar {
-    width: 40px;
-    height: 40px;
+.notification.unread {
     border: 1px solid #FFD700;
-    margin-right: 10px;
 }
 
-.post-meta-text {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-.post-username {
-    color: #FFD700;
-    font-weight: bold;
-}
-
-.post-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
-    text-align: center;
-    color: #FFD700;
-    text-transform: uppercase;
-}
-
-.post-date {
-    font-size: 12px;
+.notification-meta {
+    font-size: 14px;
     color: #AAAAAA;
 }
 
-.separator {
-    border: none;
-    border-top: 1px solid #FFD700;
-    margin: 10px 0;
+.notification-content {
+    margin-top: 10px;
 }
 
-.post-image {
-    display: block;
-    margin: 10px auto;
-    max-width: 100%;
+.notification-content a {
+    color: #A1A1FF;
 }
 
-.post-content p {
-    font-size: 14px;
-    margin: 10px 0;
-}
-
-.comment {
-    background-color: #000000;
-    padding: 20px;
-    margin: 20px auto;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(255,215,0,0.5);
-    max-width: 800px;
-    text-align: left;
-}
-
-.comment-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-.comment-meta {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-}
-
-.comment-avatar {
-    width: 40px;
-    height: 40px;
-    border: 1px solid #FFD700;
-    margin-right: 10px;
-}
-
-.comment-meta-text {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-.comment-username {
+.notification-content a:hover {
     color: #FFD700;
-    font-weight: bold;
-}
-
-.comment-date {
-    font-size: 12px;
-    color: #AAAAAA;
-}
-
-.comment-image {
-    display: block;
-    margin: 10px auto;
-    max-width: 100%;
-}
-
-.comment-content p {
-    font-size: 14px;
-    margin: 10px 0;
-}
-
-form {
-    margin: 20px auto;
-    max-width: 800px;
-    text-align: left;
-}
-
-textarea {
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    background-color: #111111;
-    color: #FFFFFF;
-    border: 1px solid #FFD700;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-input[type="file"] {
-    margin: 10px 0;
-}
-
-button {
-    background: linear-gradient(to bottom, #3366CC, #0033A0);
-    color: #FFFFFF;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-button:hover {
-    background: linear-gradient(to bottom, #0033A0, #3366CC);
 }
 
 .footer {
@@ -389,4 +243,14 @@ button:hover {
     text-align: center;
     color: #FFFFFF;
     font-size: 12px;
+}
+
+a {
+    color: #A1A1FF;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #FFD700;
 }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/stylesheet/notification.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="/static/images/lol-logo.png" alt="League of Legends Logo" class="logo-img">
+            <h1>FORUM</h1>
+        </div>
+        <div class="nav">
+            <a href="/">ACCUEIL</a>
+            <a href="/help">AIDE</a>
+        </div>
+        <div class="user-status">
+            <div class="user-info">
+                <img src="{{.User.AvatarPath}}" alt="Avatar" class="user-avatar">
+                <span class="username"><a href="/profile">{{.User.Username}}</a></span>
+            </div>
+            <div class="user-actions">
+                <a href="/notification" class="notification-button">Notifications{{if gt .UnreadCount 0}}<span class="notification-count">{{.UnreadCount}}</span>{{end}}</a>
+                <a href="/post/new" class="new-post">Nouvelle publication</a>
+                <form action="/logout" method="post" class="logout-form">
+                    <button type="submit" class="logout-button">Déconnexion</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <p>NOTIFICATIONS</p>
+    </div>
+
+    <div class="main-content">
+        <h2>Vos Notifications</h2>
+        {{range .Notifications}}
+            <div class="notification {{if eq .IsRead 0}}unread{{end}}">
+                <div class="notification-meta">
+                    De <a href="/profile/{{.FromUserID}}">{{.FromUser}}</a> - {{.CreatedAt}}
+                </div>
+                <div class="notification-content">
+                    {{if eq .Type "like_post"}}
+                        <p>{{.FromUser}} a aimé votre publication "<a href="/post/{{.PostID}}">{{.PostTitle}}</a>".</p>
+                    {{else if eq .Type "dislike_post"}}
+                        <p>{{.FromUser}} n'a pas aimé votre publication "<a href="/post/{{.PostID}}">{{.PostTitle}}</a>".</p>
+                    {{else if eq .Type "like_comment"}}
+                        <p>{{.FromUser}} a aimé votre commentaire sur "<a href="/post/{{.PostID}}">{{.PostTitle}}</a>".</p>
+                    {{else if eq .Type "dislike_comment"}}
+                        <p>{{.FromUser}} n'a pas aimé votre commentaire sur "<a href="/post/{{.PostID}}">{{.PostTitle}}</a>".</p>
+                    {{else if eq .Type "comment"}}
+                        <p>{{.FromUser}} a commenté votre publication "<a href="/post/{{.PostID}}">{{.PostTitle}}</a>".</p>
+                    {{end}}
+                </div>
+            </div>
+        {{else}}
+            <p>Aucune notification.</p>
+        {{end}}
+        <p><a href="/">Retour à l'accueil</a></p>
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Forum League of Legends - Inspiré par Riot Games</p>
+    </div>
+</body>
+</html>

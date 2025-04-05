@@ -24,6 +24,7 @@ func Launcher() {
 	http.HandleFunc("/filter/", handlers.FilterHandler)
 	http.HandleFunc("/comment/", handlers.CommentHandler)
 	http.HandleFunc("/help", handlers.HelpHandler)
+	http.HandleFunc("/notification", handlers.NotificationHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/static"))))
 

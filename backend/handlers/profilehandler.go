@@ -77,11 +77,13 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var currentUserID int
+	var unreadCount int
 	sessionID, _ := r.Cookie("session_id")
 	if sessionID != nil {
 		session, err := auth.GetSession(sessionID.Value)
 		if err == nil && session != nil {
 			currentUserID = session.UserID
+			unreadCount, _ = functions.GetUnreadNotificationCount(currentUserID)
 		}
 	}
 	t, err := template.ParseFiles("frontend/templates/profile.html")
@@ -98,6 +100,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		LikedComments    []models.Comment
 		DislikedComments []models.Comment
 		IsOwnProfile     bool
+		UnreadCount      int
 	}{
 		User:             targetUser,
 		Posts:            posts,
@@ -107,6 +110,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		LikedComments:    likedComments,
 		DislikedComments: dislikedComments,
 		IsOwnProfile:     currentUserID == targetUserID,
+		UnreadCount:      unreadCount,
 	}
 	t.Execute(w, data)
 }

@@ -270,9 +270,10 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		data := struct {
-			Post     *models.Post
-			Comments []models.Comment
-			User     *models.User
+			Post        *models.Post
+			Comments    []models.Comment
+			User        *models.User
+			UnreadCount int
 		}{
 			Post:     post,
 			Comments: comments,
@@ -280,6 +281,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 		if cookie, err := r.Cookie("session_id"); err == nil {
 			if session, err := auth.GetSession(cookie.Value); err == nil && session != nil {
 				data.User, _ = functions.GetUserByID(session.UserID)
+				data.UnreadCount, _ = functions.GetUnreadNotificationCount(session.UserID)
 			}
 		}
 		t.Execute(w, data)

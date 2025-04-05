@@ -15,11 +15,13 @@ func HelpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user *models.User
+	var unreadCount int
 	sessionID, err := r.Cookie("session_id")
 	if err == nil {
 		session, err := auth.GetSession(sessionID.Value)
 		if err == nil && session != nil {
 			user, _ = functions.GetUserByID(session.UserID)
+			unreadCount, _ = functions.GetUnreadNotificationCount(session.UserID)
 		}
 	}
 
@@ -30,9 +32,11 @@ func HelpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		User *models.User
+		User        *models.User
+		UnreadCount int
 	}{
-		User: user,
+		User:        user,
+		UnreadCount: unreadCount,
 	}
 	t.Execute(w, data)
 }
