@@ -4,37 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Éditer un post</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/stylesheet/editpost.css">
 </head>
 <body>
-    <h1>Éditer un post</h1>
-    {{if .Error}}
-        <p style="color: red;">{{.Error}}</p>
-    {{end}}
-    <form method="POST" enctype="multipart/form-data">
-        <label for="title">Titre :</label><br>
-        <input type="text" id="title" name="title" value="{{.Post.Title}}" required><br><br>
+    <div class="header">
+        <div class="logo">
+            <img src="/static/images/lol-logo.png" alt="League of Legends Logo" class="logo-img">
+            <h1>FORUM</h1>
+        </div>
+        <div class="nav">
+            <a href="/">ACCUEIL</a>
+            <a href="/help">AIDE</a>
+            {{if not .User}}
+                <a href="/login">CONNEXION</a>
+                <a href="/register">INSCRIPTION</a>
+            {{end}}
+        </div>
+        <div class="user-status">
+            {{if .User}}
+                <div class="user-info">
+                    <img src="{{.User.AvatarPath}}" alt="Avatar" class="user-avatar">
+                    <span class="username"><a href="/profile">{{.User.Username}}</a></span>
+                </div>
+                <div class="user-actions">
+                    <a href="/notification" class="notification-button">
+                        Notifications{{if gt .UnreadCount 0}}<span class="notification-count">{{.UnreadCount}}</span>{{end}}
+                    </a>
+                    <a href="/post/new" class="new-post">Nouvelle publication</a>
+                    <form action="/logout" method="post" class="logout-form">
+                        <button type="submit" class="logout-button">Déconnexion</button>
+                    </form>
+                </div>
+            {{else}}
+                <div class="auth-buttons">
+                    <a href="/login" class="auth-button login-button">Connexion</a>
+                    <a href="/register" class="auth-button register-button">Inscription</a>
+                </div>
+            {{end}}
+        </div>
+    </div>
 
-        <label for="content">Contenu :</label><br>
-        <textarea id="content" name="content" required>{{.Post.Content}}</textarea><br><br>
+    <div class="breadcrumb">
+        <p>Éditer le post de {{if .User}}{{.User.Username}}{{else}}INVITÉ{{end}}</p>
+    </div>
 
-        <label>Catégories :</label><br>
-        {{range .Categories}}
-            <input type="checkbox" name="categories[]" value="{{.}}" {{if in $.Post.Categories .}}checked{{end}}>
-            {{.}}<br>
-        {{end}}<br>
-
-        <label for="new_categories">Ajouter de nouvelles catégories (séparées par des virgules) :</label><br>
-        <input type="text" id="new_categories" name="new_categories"><br><br>
-
-        <label for="image">Image (facultatif) :</label><br>
-        {{if .Post.ImagePath}}
-            <p>Image actuelle : <img src="{{.Post.ImagePath}}" alt="Image du post" style="max-width: 200px;"></p>
+    <div class="main-content">
+        <h2>Éditer un post</h2>
+        {{if .Error}}
+            <p class="error">{{.Error}}</p>
         {{end}}
-        <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif"><br><br>
+        <form method="POST" enctype="multipart/form-data" class="post-form">
+            <label for="title">
+                Titre :
+                <input type="text" id="title" name="title" value="{{.Post.Title}}" required>
+            </label>
+            <label for="content">
+                Contenu :
+                <textarea id="content" name="content" required>{{.Post.Content}}</textarea>
+            </label>
+            <fieldset>
+                <legend>Catégories</legend>
+                {{range .Categories}}
+                    <label>
+                        <input type="checkbox" name="categories[]" value="{{.}}" {{if in $.Post.Categories .}}checked{{end}}>
+                        {{.}}
+                    </label>
+                {{end}}
+            </fieldset>
+            <label for="new_categories">
+                Ajouter de nouvelles catégories (séparées par des virgules) :
+                <input type="text" id="new_categories" name="new_categories">
+            </label>
+            <fieldset>
+                <legend>Image</legend>
+                {{if .Post.ImagePath}}
+                    <p>Image actuelle :</p>
+                    <img src="{{.Post.ImagePath}}" alt="Image du post" class="post-image">
+                {{end}}
+                <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif">
+            </fieldset>
+            <button type="submit" class="save-button">Mettre à jour</button>
+        </form>
+        <p class="back-link"><a href="/post/{{.Post.ID}}">Retour au post</a></p>
+    </div>
 
-        <button type="submit">Mettre à jour</button>
-    </form>
-    <a href="/post/{{.Post.ID}}">Retour au post</a>
+    <div class="footer">
+        <p>© 2025 Forum League of Legends - Inspiré par Riot Games</p>
+    </div>
 </body>
 </html>
