@@ -60,12 +60,33 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 				ErrorHandler(w, r, http.StatusInternalServerError)
 				return
 			}
+			post, err := functions.GetPostByID(comment.PostID)
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			user, err := functions.GetUserByID(session.UserID)
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			unreadCount, err := functions.GetUnreadNotificationCount(session.UserID)
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
 			data := struct {
-				Comment *models.Comment
-				Error   string
+				User        *models.User
+				Post        *models.Post
+				Comment     *models.Comment
+				Error       string
+				UnreadCount int
 			}{
-				Comment: comment,
-				Error:   "",
+				User:        user,
+				Post:        post,
+				Comment:     comment,
+				Error:       "",
+				UnreadCount: unreadCount,
 			}
 			t.Execute(w, data)
 		} else if r.Method == "POST" {
@@ -81,12 +102,21 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 				defer file.Close()
 				if handler.Size > maxUploadSize {
 					t, _ := template.ParseFiles("frontend/templates/editcomment.html")
+					post, _ := functions.GetPostByID(comment.PostID)
+					user, _ := functions.GetUserByID(session.UserID)
+					unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
 					data := struct {
-						Comment *models.Comment
-						Error   string
+						User        *models.User
+						Post        *models.Post
+						Comment     *models.Comment
+						Error       string
+						UnreadCount int
 					}{
-						Comment: comment,
-						Error:   "L'image est trop volumineuse (max 20 Mo).",
+						User:        user,
+						Post:        post,
+						Comment:     comment,
+						Error:       "L'image est trop volumineuse (max 20 Mo).",
+						UnreadCount: unreadCount,
 					}
 					t.Execute(w, data)
 					return
@@ -102,12 +132,21 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				if !validExt {
 					t, _ := template.ParseFiles("frontend/templates/editcomment.html")
+					post, _ := functions.GetPostByID(comment.PostID)
+					user, _ := functions.GetUserByID(session.UserID)
+					unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
 					data := struct {
-						Comment *models.Comment
-						Error   string
+						User        *models.User
+						Post        *models.Post
+						Comment     *models.Comment
+						Error       string
+						UnreadCount int
 					}{
-						Comment: comment,
-						Error:   "Extension d'image non supportée (JPEG, PNG, GIF uniquement).",
+						User:        user,
+						Post:        post,
+						Comment:     comment,
+						Error:       "Extension d'image non supportée (JPEG, PNG, GIF uniquement).",
+						UnreadCount: unreadCount,
 					}
 					t.Execute(w, data)
 					return

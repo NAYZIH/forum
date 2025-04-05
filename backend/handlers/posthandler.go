@@ -101,21 +101,28 @@ const maxUploadSize = 20 * 1024 * 1024
 const uploadPath = "./frontend/static/images/posts/"
 
 func NewPostHandler(w http.ResponseWriter, r *http.Request) {
-	sessionID, err := r.Cookie("session_id")
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-	session, err := auth.GetSession(sessionID.Value)
-	if err != nil || session == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	if r.URL.Path != "/post/new" {
+		ErrorHandler(w, r, http.StatusNotFound)
 		return
 	}
 
-	categories, err := functions.GetAllCategories()
-	if err != nil {
-		ErrorHandler(w, r, http.StatusInternalServerError)
-		return
+	sessionID, err := r.Cookie("session_id")
+	var user *models.User
+	var unreadCount int
+	if err == nil {
+		session, err := auth.GetSession(sessionID.Value)
+		if err == nil && session != nil {
+			user, err = functions.GetUserByID(session.UserID)
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+			unreadCount, err = functions.GetUnreadNotificationCount(session.UserID)
+			if err != nil {
+				ErrorHandler(w, r, http.StatusInternalServerError)
+				return
+			}
+		}
 	}
 
 	if r.Method == "GET" {
@@ -124,63 +131,60 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return
 		}
+		categories, err := functions.GetAllCategories()
+		if err != nil {
+			ErrorHandler(w, r, http.StatusInternalServerError)
+			return
+		}
 		data := struct {
-			Categories []string
-			Error      string
+			User        *models.User
+			Categories  []string
+			Error       string
+			UnreadCount int
 		}{
-			Categories: categories,
-			Error:      "",
+			User:        user,
+			Categories:  categories,
+			Error:       "",
+			UnreadCount: unreadCount,
 		}
 		t.Execute(w, data)
 	} else if r.Method == "POST" {
-		err := r.ParseMultipartForm(maxUploadSize)
+		sessionID, err := r.Cookie("session_id")
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		session, err := auth.GetSession(sessionID.Value)
+		if err != nil || session == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		err = r.ParseMultipartForm(maxUploadSize)
 		if err != nil {
 			http.Error(w, "Fichier trop volumineux", http.StatusBadRequest)
 			return
 		}
-
 		title := r.FormValue("title")
 		content := r.FormValue("content")
-		selectedCategories := r.Form["categories[]"]
-		newCategoriesStr := r.FormValue("new_categories")
-
-		newCategories := strings.Split(newCategoriesStr, ",")
-		for i, cat := range newCategories {
-			newCategories[i] = strings.TrimSpace(cat)
-		}
-
-		var allCategories []string
-		for _, cat := range append(selectedCategories, newCategories...) {
-			if cat != "" {
-				allCategories = append(allCategories, cat)
+		categories := r.Form["categories[]"]
+		newCategories := r.FormValue("new_categories")
+		if newCategories != "" {
+			newCats := strings.Split(newCategories, ",")
+			for i, cat := range newCats {
+				newCats[i] = strings.TrimSpace(cat)
 			}
-		}
-
-		if len(allCategories) == 0 {
-			t, err := template.ParseFiles("frontend/templates/newpost.html")
-			if err != nil {
-				ErrorHandler(w, r, http.StatusInternalServerError)
-				return
-			}
-			data := struct {
-				Categories []string
-				Error      string
-			}{
-				Categories: categories,
-				Error:      "Veuillez sélectionner ou créer au moins une catégorie.",
-			}
-			t.Execute(w, data)
-			return
+			categories = append(categories, newCats...)
 		}
 
 		file, handler, err := r.FormFile("image")
 		var imagePath string
 		if err == nil {
 			defer file.Close()
-
 			if handler.Size > maxUploadSize {
 				t, _ := template.ParseFiles("frontend/templates/newpost.html")
 				data := struct {
+					User       *models.User
 					Categories []string
 					Error      string
 				}{
@@ -190,7 +194,6 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 				t.Execute(w, data)
 				return
 			}
-
 			ext := strings.ToLower(filepath.Ext(handler.Filename))
 			allowedExts := []string{".jpg", ".jpeg", ".png", ".gif"}
 			validExt := false
@@ -203,6 +206,7 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 			if !validExt {
 				t, _ := template.ParseFiles("frontend/templates/newpost.html")
 				data := struct {
+					User       *models.User
 					Categories []string
 					Error      string
 				}{
@@ -212,12 +216,10 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 				t.Execute(w, data)
 				return
 			}
-
 			if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
 				ErrorHandler(w, r, http.StatusInternalServerError)
 				return
 			}
-
 			imagePath = uploadPath + strconv.FormatInt(time.Now().UnixNano(), 10) + ext
 			f, err := os.OpenFile(imagePath, os.O_WRONLY|os.O_CREATE, 0666)
 			if err != nil {
@@ -226,11 +228,10 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			defer f.Close()
 			io.Copy(f, file)
-
 			imagePath = "/static/images/posts/" + filepath.Base(imagePath)
 		}
 
-		err = functions.CreatePost(session.UserID, title, content, allCategories, imagePath)
+		err = functions.CreatePost(session.UserID, title, content, categories, imagePath)
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return
@@ -326,14 +327,21 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 				ErrorHandler(w, r, http.StatusInternalServerError)
 				return
 			}
+			user, _ := functions.GetUserByID(session.UserID)
+			unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
+
 			data := struct {
-				Post       *models.Post
-				Categories []string
-				Error      string
+				Post        *models.Post
+				Categories  []string
+				Error       string
+				User        *models.User
+				UnreadCount int
 			}{
-				Post:       post,
-				Categories: categories,
-				Error:      "",
+				Post:        post,
+				Categories:  categories,
+				Error:       "",
+				User:        user,
+				UnreadCount: unreadCount,
 			}
 			t.Execute(w, data)
 		} else if r.Method == "POST" {
@@ -376,17 +384,23 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 					ErrorHandler(w, r, http.StatusInternalServerError)
 					return
 				}
+				user, _ := functions.GetUserByID(session.UserID)
+				unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
+
 				data := struct {
-					Post       *models.Post
-					Categories []string
-					Error      string
+					Post        *models.Post
+					Categories  []string
+					Error       string
+					User        *models.User
+					UnreadCount int
 				}{
-					Post:       post,
-					Categories: categories,
-					Error:      "Veuillez sélectionner ou créer au moins une catégorie.",
+					Post:        post,
+					Categories:  categories,
+					Error:       "",
+					User:        user,
+					UnreadCount: unreadCount,
 				}
 				t.Execute(w, data)
-				return
 			}
 			file, handler, err := r.FormFile("image")
 			var imagePath string
@@ -412,17 +426,23 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 						ErrorHandler(w, r, http.StatusInternalServerError)
 						return
 					}
+					user, _ := functions.GetUserByID(session.UserID)
+					unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
+
 					data := struct {
-						Post       *models.Post
-						Categories []string
-						Error      string
+						Post        *models.Post
+						Categories  []string
+						Error       string
+						User        *models.User
+						UnreadCount int
 					}{
-						Post:       post,
-						Categories: categories,
-						Error:      "L'image est trop volumineuse (max 20 Mo).",
+						Post:        post,
+						Categories:  categories,
+						Error:       "",
+						User:        user,
+						UnreadCount: unreadCount,
 					}
 					t.Execute(w, data)
-					return
 				}
 				ext := strings.ToLower(filepath.Ext(handler.Filename))
 				allowedExts := []string{".jpg", ".jpeg", ".png", ".gif"}
@@ -453,14 +473,21 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 						ErrorHandler(w, r, http.StatusInternalServerError)
 						return
 					}
+					user, _ := functions.GetUserByID(session.UserID)
+					unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
+
 					data := struct {
-						Post       *models.Post
-						Categories []string
-						Error      string
+						Post        *models.Post
+						Categories  []string
+						Error       string
+						User        *models.User
+						UnreadCount int
 					}{
-						Post:       post,
-						Categories: categories,
-						Error:      "Extension d'image non supportée (JPEG, PNG, GIF uniquement).",
+						Post:        post,
+						Categories:  categories,
+						Error:       "",
+						User:        user,
+						UnreadCount: unreadCount,
 					}
 					t.Execute(w, data)
 					return

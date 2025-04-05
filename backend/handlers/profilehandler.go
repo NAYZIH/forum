@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -116,6 +117,11 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/profile/edit" {
+		ErrorHandler(w, r, http.StatusNotFound)
+		return
+	}
+
 	sessionID, err := r.Cookie("session_id")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -131,6 +137,21 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
+	unreadCount, err := functions.GetUnreadNotificationCount(session.UserID)
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+
+	avatars, err := filepath.Glob("frontend/static/images/profile/*.png")
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+	for i, avatar := range avatars {
+		avatars[i] = "/" + strings.Replace(avatar, "frontend/", "", 1)
+	}
+
 	if r.Method == "GET" {
 		avatars, err := getAvailableAvatars()
 		if err != nil {
@@ -142,11 +163,19 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			ErrorHandler(w, r, http.StatusInternalServerError)
 			return
 		}
-		data := models.EditProfileData{
-			User:    user,
-			Avatars: avatars,
+		data := struct {
+			User        *models.User
+			Avatars     []string
+			Error       string
+			UnreadCount int
+		}{
+			User:        user,
+			Avatars:     avatars,
+			Error:       "",
+			UnreadCount: unreadCount,
 		}
 		t.Execute(w, data)
+		return
 	} else if r.Method == "POST" {
 		currentPassword := r.FormValue("current_password")
 		newUsername := r.FormValue("username")

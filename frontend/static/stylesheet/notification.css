@@ -100,7 +100,7 @@ h1, h2, h3 {
 }
 
 .notification-button {
-    background: linear-gradient(to bottom, #33CC33, #00A000);
+    background: linear-gradient(to bottom, #FF8C00, #FF4500);
     padding: 5px 10px;
     border-radius: 3px;
     font-size: 12px;
@@ -111,7 +111,7 @@ h1, h2, h3 {
 }
 
 .notification-button:hover {
-    background: linear-gradient(to bottom, #00A000, #33CC33);
+    background: linear-gradient(to bottom, #FF4500, #FF8C00);
 }
 
 .notification-count {
