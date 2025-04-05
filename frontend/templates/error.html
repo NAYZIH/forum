@@ -4,11 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Erreur</title>
-    <link rel="stylesheet" href="/static/stylesheet/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/stylesheet/error.css">
 </head>
 <body>
-    <h1>Erreur {{.Status}}</h1>
-    <p>Une erreur est survenue. Veuillez réessayer plus tard.</p>
-    <p><a href="/">Retour à l'accueil</a></p>
+
+    <div class="header">
+        <div class="logo">
+            <img src="/static/images/lol-logo.png" alt="League of Legends Logo" class="logo-img">
+            <h1>FORUM</h1>
+        </div>
+        <div class="nav">
+            <a href="/">ACCUEIL</a>
+            <a href="/help">AIDE</a>
+            {{if not .User}}
+                <a href="/login">CONNEXION</a>
+                <a href="/register">INSCRIPTION</a>
+            {{end}}
+        </div> 
+        <div class="user-status">
+            {{if .User}}
+                <div class="user-info">
+                    <img src="{{.User.AvatarPath}}" alt="Avatar" class="user-avatar">
+                    <span class="username"><a href="/profile">{{.User.Username}}</a></span>
+                </div>
+                <div class="user-actions">
+                    <a href="/notification" class="notification-button">Notifications{{if gt .UnreadCount 0}}<span class="notification-count">{{.UnreadCount}}</span>{{end}}</a>
+                    <a href="/post/new" class="new-post">Nouvelle publication</a>
+                    <form action="/logout" method="post" class="logout-form">
+                        <button type="submit" class="logout-button">Déconnexion</button>
+                    </form>
+                </div>
+            {{else}}
+                <div class="auth-buttons">
+                    <a href="/login" class="auth-button login-button">Connexion</a>
+                    <a href="/register" class="auth-button register-button">Inscription</a>
+                </div>
+            {{end}}
+        </div>
+    </div>
+
+    <div class="breadcrumb">
+        <p>Page d'erreur</p>
+    </div>
+
+    <div class="main-content">
+        <h2>Erreur {{.Status}}</h2>
+        <p>Une erreur est survenue. Veuillez réessayer plus tard.</p>
+        <p><a href="/">Retour à l'accueil</a></p>
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Forum League of Legends - Inspiré par Riot Games</p>
+    </div>
 </body>
 </html>
