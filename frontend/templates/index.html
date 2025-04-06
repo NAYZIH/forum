@@ -50,15 +50,15 @@
 
     <div class="main-content">
         <h2>Publications</h2>
-        {{if .User}}
             <p>Filtres : 
                 {{range .Categories}}
                     <a href="/filter/category?category={{.}}">{{.}}</a> | 
                 {{end}}
+                {{if .User}}
                 <a href="/filter/created">Mes publications</a> | 
                 <a href="/filter/liked">Publications aimées</a>
+                {{end}}
             </p>
-        {{end}}
         {{range .Posts}}
             <div class="post">
                 <div class="post-header">
