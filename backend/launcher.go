@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"forum/backend/database"
 	"forum/backend/handlers"
+	"forum/backend/websocket"
 	"log"
 	"net/http"
 )
@@ -25,6 +26,9 @@ func Launcher() {
 	http.HandleFunc("/comment/", handlers.CommentHandler)
 	http.HandleFunc("/help", handlers.HelpHandler)
 	http.HandleFunc("/notification", handlers.NotificationHandler)
+	http.HandleFunc("/ws", websocket.HandleConnections)
+
+	go websocket.HandleMessages()
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/static"))))
 

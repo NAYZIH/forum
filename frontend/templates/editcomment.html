@@ -6,6 +6,7 @@
     <title>Modifier le commentaire</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/stylesheet/editcomment.css">
+    <script src="/static/scripts/notification.js"></script>
 </head>
 <body>
 
@@ -29,9 +30,7 @@
                     <span class="username"><a href="/profile">{{.User.Username}}</a></span>
                 </div>
                 <div class="user-actions">
-                    <a href="/notification" class="notification-button">
-                        Notifications{{if gt .UnreadCount 0}}<span class="notification-count">{{.UnreadCount}}</span>{{end}}
-                    </a>
+                    <a href="/notification" class="notification-button">Notifications<span id="notification-count">{{if gt .UnreadCount 0}}{{.UnreadCount}}{{end}}</span></a>
                     <a href="/post/new" class="new-post">Nouvelle publication</a>
                     <form action="/logout" method="post" class="logout-form">
                         <button type="submit" class="logout-button">Déconnexion</button>

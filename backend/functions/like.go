@@ -27,21 +27,6 @@ func GetCommentLikeValue(userID, commentID int) (int, error) {
 	return value, nil
 }
 
-func createNotification(userID, fromUserID int, notificationType string, postID, commentID *int) error {
-	var pID, cID sql.NullInt64
-	if postID != nil {
-		pID = sql.NullInt64{Int64: int64(*postID), Valid: true}
-	}
-	if commentID != nil {
-		cID = sql.NullInt64{Int64: int64(*commentID), Valid: true}
-	}
-	_, err := database.DB.Exec(`
-		INSERT INTO notifications (user_id, type, post_id, comment_id, from_user_id)
-		VALUES (?, ?, ?, ?, ?)`,
-		userID, notificationType, pID, cID, fromUserID)
-	return err
-}
-
 func LikePost(userID, postID int, action string) error {
 	currentValue, err := GetPostLikeValue(userID, postID)
 	if err != nil {

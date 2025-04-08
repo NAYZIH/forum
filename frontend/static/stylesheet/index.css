@@ -103,6 +103,7 @@ h1, h2, h3 {
     border-radius: 3px;
     font-size: 12px;
     color: #FFFFFF;
+    font-weight: bold;
     text-decoration: none;
     position: relative;
     transition: background 0.3s ease;
@@ -112,7 +113,7 @@ h1, h2, h3 {
     background: linear-gradient(to bottom, #FF4500, #FF8C00);
 }
 
-.notification-count {
+#notification-count {
     position: absolute;
     top: -5px;
     right: -5px;
@@ -126,12 +127,17 @@ h1, h2, h3 {
     text-align: center;
 }
 
+#notification-count:empty {
+    display: none;
+}
+
 .new-post {
     background: linear-gradient(to bottom, #3366CC, #0033A0);
     padding: 5px 10px;
     border-radius: 3px;
     font-size: 12px;
     color: #FFFFFF;
+    font-weight: bold;
     text-decoration: none;
     transition: background 0.3s ease;
 }
@@ -150,6 +156,7 @@ h1, h2, h3 {
     border: none;
     border-radius: 3px;
     color: #FFFFFF;
+    font-weight: bold;
     font-size: 12px;
     cursor: pointer;
     transition: background 0.3s ease;

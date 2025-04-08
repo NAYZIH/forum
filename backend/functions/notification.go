@@ -2,8 +2,11 @@ package functions
 
 import (
 	"database/sql"
+	"encoding/json"
 	"forum/backend/database"
 	"forum/backend/models"
+	"forum/backend/websocket"
+	"log"
 )
 
 func GetNotificationsByUserID(userID int) ([]models.Notification, error) {
@@ -54,4 +57,34 @@ func GetUnreadNotificationCount(userID int) (int, error) {
 func MarkNotificationsAsRead(userID int) error {
 	_, err := database.DB.Exec("UPDATE notifications SET is_read = 1 WHERE user_id = ?", userID)
 	return err
+}
+
+func createNotification(userID, fromUserID int, notificationType string, postID, commentID *int) error {
+	var pID, cID sql.NullInt64
+	if postID != nil {
+		pID = sql.NullInt64{Int64: int64(*postID), Valid: true}
+	}
+	if commentID != nil {
+		cID = sql.NullInt64{Int64: int64(*commentID), Valid: true}
+	}
+	_, err := database.DB.Exec(`
+		INSERT INTO notifications (user_id, type, post_id, comment_id, from_user_id)
+		VALUES (?, ?, ?, ?, ?)`,
+		userID, notificationType, pID, cID, fromUserID)
+	if err != nil {
+		return err
+	}
+
+	count, err := GetUnreadNotificationCount(userID)
+	if err != nil {
+		log.Println("Erreur lors de la récupération du nombre de notifications non lues :", err)
+		return nil
+	}
+	message, _ := json.Marshal(map[string]interface{}{
+		"type":  "notification",
+		"count": count,
+	})
+	websocket.BroadcastMessage(message)
+
+	return nil
 }
