@@ -16,13 +16,6 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-type Config struct {
-	GoogleClientID     string `json:"google_client_id"`
-	GoogleClientSecret string `json:"google_client_secret"`
-	GithubClientID     string `json:"github_client_id"`
-	GithubClientSecret string `json:"github_client_secret"`
-}
-
 var GoogleOauthConfig *oauth2.Config
 var GithubOauthConfig *oauth2.Config
 
@@ -34,7 +27,7 @@ func init() {
 	}
 	defer file.Close()
 
-	var config Config
+	var config models.Config
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
 		log.Fatalf("Erreur lors du décodage de config.json : %v", err)

@@ -10,8 +10,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func ProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -177,23 +175,11 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, data)
 		return
 	} else if r.Method == "POST" {
-		currentPassword := r.FormValue("current_password")
 		newUsername := r.FormValue("username")
 		newEmail := r.FormValue("email")
 		newBio := r.FormValue("bio")
 		newAvatar := r.FormValue("avatar")
-		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPassword))
-		if err != nil {
-			avatars, _ := getAvailableAvatars()
-			t, _ := template.ParseFiles("frontend/templates/editprofile.html")
-			data := models.EditProfileData{
-				User:    user,
-				Avatars: avatars,
-				Error:   "Mot de passe actuel incorrect",
-			}
-			t.Execute(w, data)
-			return
-		}
+
 		exists, err := functions.EmailExists(newEmail, user.ID)
 		if err != nil {
 			ErrorHandler(w, r, http.StatusInternalServerError)
