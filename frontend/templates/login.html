@@ -8,21 +8,18 @@
     <link rel="stylesheet" href="static/stylesheet/login.css">
 </head>
 <body>
-
     <div class="header">
         <div class="logo">
             <img src="static/images/lol-logo.png" alt="League of Legends Logo" class="logo-img">
             <h1>FORUM</h1>
         </div>
-            <div class="nav">
-                <a href="/">ACCUEIL</a>
-                <a href="/help">AIDE</a>
-                <a href="/login">CONNEXION</a>
-                <a href="/register">INSCRIPTION</a>
-            </div>
-            <div class="user-status">
-            </div>
+        <div class="nav">
+            <a href="/">ACCUEIL</a>
+            <a href="/help">AIDE</a>
+            <a href="/login">CONNEXION</a>
+            <a href="/register">INSCRIPTION</a>
         </div>
+        <div class="user-status"></div>
     </div>
 
     <div class="breadcrumb">
@@ -49,6 +46,20 @@
                 <button type="submit">Se connecter</button>
             </form>
             <p><a href="/register">Pas de compte ? Inscrivez-vous</a></p>
+            <div class="oauth-buttons">
+                <a href="/login/google" class="oauth-button google-button">
+                    <span class="oauth-button-icon">
+                        <img src="static/images/google-logo.png" alt="Google Logo" class="oauth-logo">
+                    </span>
+                    <span class="oauth-button-text">Continuer avec Google</span>
+                </a>
+                <a href="/login/github" class="oauth-button github-button">
+                    <span class="oauth-button-icon">
+                        <img src="static/images/github-logo.png" alt="GitHub Logo" class="oauth-logo">
+                    </span>
+                    <span class="oauth-button-text">Continuer avec GitHub</span>
+                </a>
+            </div>
         </div>
     </div>
 

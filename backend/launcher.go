@@ -26,6 +26,10 @@ func Launcher() {
 	http.HandleFunc("/comment/", handlers.CommentHandler)
 	http.HandleFunc("/help", handlers.HelpHandler)
 	http.HandleFunc("/notification", handlers.NotificationHandler)
+	http.HandleFunc("/login/google", handlers.GoogleLoginHandler)
+	http.HandleFunc("/callback/google", handlers.GoogleCallbackHandler)
+	http.HandleFunc("/login/github", handlers.GithubLoginHandler)
+	http.HandleFunc("/callback/github", handlers.GithubCallbackHandler)
 	http.HandleFunc("/ws", websocket.HandleConnections)
 
 	go websocket.HandleMessages()
