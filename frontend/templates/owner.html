@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion par l'Owner</title>
+    <link rel="stylesheet" href="/static/stylesheet/owner.css">
+</head>
+<body>
+    <h1>Interface de gestion de l'Owner</h1>
+    <p>Connecté en tant que : {{.Owner.Username}} ({{.Owner.Role}})</p>
+
+    <h2>Gérer les utilisateurs existants</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Users}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Username}}</td>
+                <td>{{.Email}}</td>
+                <td>{{.Role}}</td>
+                <td>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="update">
+                        <input type="hidden" name="user_id" value="{{.ID}}">
+                        <label>Username: <input type="text" name="username" value="{{.Username}}"></label>
+                        <label>Email: <input type="email" name="email" value="{{.Email}}"></label>
+                        <label>Bio: <textarea name="bio">{{.Bio}}</textarea></label>
+                        <button type="submit">Modifier</button>
+                    </form>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="update_role">
+                        <input type="hidden" name="user_id" value="{{.ID}}">
+                        <select name="role">
+                            <option value="utilisateur" {{if eq .Role "utilisateur"}}selected{{end}}>Utilisateur</option>
+                            <option value="moderateur" {{if eq .Role "moderateur"}}selected{{end}}>Modérateur</option>
+                            <option value="administrateur" {{if eq .Role "administrateur"}}selected{{end}}>Administrateur</option>
+                            <option value="owner" {{if eq .Role "owner"}}selected{{end}}>Owner</option>
+                        </select>
+                        <button type="submit">Changer rôle</button>
+                    </form>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="user_id" value="{{.ID}}">
+                        <button type="submit" onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?');">Supprimer</button>
+                    </form>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="force_logout">
+                        <input type="hidden" name="user_id" value="{{.ID}}">
+                        <button type="submit">Forcer déconnexion</button>
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    <p><a href="/">Retour à l'accueil</a></p>
+</body>
+</html>

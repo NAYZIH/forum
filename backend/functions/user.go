@@ -4,6 +4,8 @@ import (
 	"forum/backend/database"
 	"forum/backend/models"
 
+	"database/sql"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -92,6 +94,79 @@ func GetAllUsers() ([]models.User, error) {
 }
 
 func UpdateUserRole(userID int, role string) error {
+	if role == "owner" {
+		var count int
+		err := database.DB.QueryRow("SELECT COUNT(*) FROM users WHERE role = 'owner' AND id != ?", userID).Scan(&count)
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return sql.ErrNoRows
+		}
+	}
 	_, err := database.DB.Exec("UPDATE users SET role = ? WHERE id = ?", role, userID)
+	return err
+}
+
+func OwnerExists() (bool, error) {
+	var count int
+	err := database.DB.QueryRow("SELECT COUNT(*) FROM users WHERE role = 'owner'").Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func DeleteUser(userID int) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	_, err = tx.Exec("DELETE FROM sessions WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM post_likes WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM comment_likes WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM comments WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM post_categories WHERE post_id IN (SELECT id FROM posts WHERE user_id = ?)", userID)
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM posts WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM users WHERE id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ForceLogout(userID int) error {
+	_, err := database.DB.Exec("DELETE FROM sessions WHERE user_id = ?", userID)
 	return err
 }

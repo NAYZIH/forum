@@ -41,6 +41,11 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
+	user, err := functions.GetUserByID(session.UserID)
+	if err != nil {
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
 
 	comment, err := functions.GetCommentByID(id)
 	if err != nil {
@@ -48,7 +53,9 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if session.UserID != comment.UserID {
+	isOwner := user.Role == "owner"
+
+	if !isOwner && session.UserID != comment.UserID {
 		http.Error(w, "Non autorisé", http.StatusUnauthorized)
 		return
 	}
@@ -61,11 +68,6 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			post, err := functions.GetPostByID(comment.PostID)
-			if err != nil {
-				ErrorHandler(w, r, http.StatusInternalServerError)
-				return
-			}
-			user, err := functions.GetUserByID(session.UserID)
 			if err != nil {
 				ErrorHandler(w, r, http.StatusInternalServerError)
 				return
@@ -103,7 +105,6 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 				if handler.Size > maxUploadSize {
 					t, _ := template.ParseFiles("frontend/templates/editcomment.html")
 					post, _ := functions.GetPostByID(comment.PostID)
-					user, _ := functions.GetUserByID(session.UserID)
 					unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
 					data := struct {
 						User        *models.User
@@ -133,7 +134,6 @@ func CommentHandler(w http.ResponseWriter, r *http.Request) {
 				if !validExt {
 					t, _ := template.ParseFiles("frontend/templates/editcomment.html")
 					post, _ := functions.GetPostByID(comment.PostID)
-					user, _ := functions.GetUserByID(session.UserID)
 					unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
 					data := struct {
 						User        *models.User

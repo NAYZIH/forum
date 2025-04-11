@@ -25,7 +25,7 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Utilisateur introuvable", http.StatusInternalServerError)
 		return
 	}
-	if adminUser.Role != "administrateur" {
+	if adminUser.Role != "administrateur" && adminUser.Role != "owner" {
 		http.Error(w, "Accès refusé", http.StatusForbidden)
 		return
 	}
