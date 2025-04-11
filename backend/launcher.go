@@ -30,8 +30,11 @@ func Launcher() {
 	http.HandleFunc("/callback/google", handlers.GoogleCallbackHandler)
 	http.HandleFunc("/login/github", handlers.GithubLoginHandler)
 	http.HandleFunc("/callback/github", handlers.GithubCallbackHandler)
-	http.HandleFunc("/ws", websocket.HandleConnections)
 
+	http.HandleFunc("/moderation", handlers.ModerationHandler)
+	http.HandleFunc("/admin", handlers.AdminHandler)
+
+	http.HandleFunc("/ws", websocket.HandleConnections)
 	go websocket.HandleMessages()
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/static"))))

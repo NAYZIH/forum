@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modération des postes</title>
+    <link rel="stylesheet" href="/static/stylesheet/moderation.css">
+</head>
+<body>
+    <h1>Interface de modération</h1>
+    <p>Connecté en tant que : {{.User.Username}} ({{.User.Role}})</p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Titre</th>
+                <th>Auteur</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Posts}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Title}}</td>
+                <td>{{.Username}}</td>
+                <td>{{.CreatedAt}}</td>
+                <td>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="post_id" value="{{.ID}}">
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit">Approuver</button>
+                    </form>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="post_id" value="{{.ID}}">
+                        <input type="hidden" name="action" value="reject">
+                        <select name="flag" required>
+                            <option value="">Sélectionner le motif</option>
+                            <option value="non pertinent">Non pertinent</option>
+                            <option value="obscène">Obscène</option>
+                            <option value="illégal">Illégal</option>
+                            <option value="insultant">Insultant</option>
+                        </select>
+                        <button type="submit">Rejeter</button>
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Administration des utilisateurs</title>
+    <link rel="stylesheet" href="/static/stylesheet/admin.css">
+</head>
+<body>
+    <h1>Interface d'administration</h1>
+    <p>Connecté en tant qu'administrateur : {{.Admin.Username}}</p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Nom d'utilisateur</th>
+                <th>Rôle</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Users}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Email}}</td>
+                <td>{{.Username}}</td>
+                <td>{{.Role}}</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="user_id" value="{{.ID}}">
+                        <select name="role" required>
+                            <option value="utilisateur" {{if eq .Role "utilisateur"}}selected{{end}}>Utilisateur</option>
+                            <option value="modérateur" {{if eq .Role "modérateur"}}selected{{end}}>Modérateur</option>
+                            <option value="administrateur" {{if eq .Role "administrateur"}}selected{{end}}>Administrateur</option>
+                        </select>
+                        <button type="submit">Mettre à jour</button>
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</body>
+</html>

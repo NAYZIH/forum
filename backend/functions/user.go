@@ -18,9 +18,9 @@ func CreateUser(email, username, password, bio string) error {
 }
 
 func GetUserByEmail(email string) (*models.User, error) {
-	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, created_at FROM users WHERE email = ?", email)
+	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, role, created_at FROM users WHERE email = ?", email)
 	user := &models.User{}
-	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.Role, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +28,9 @@ func GetUserByEmail(email string) (*models.User, error) {
 }
 
 func GetUserByID(id int) (*models.User, error) {
-	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, created_at FROM users WHERE id = ?", id)
+	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, role, created_at FROM users WHERE id = ?", id)
 	user := &models.User{}
-	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.Role, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -38,9 +38,9 @@ func GetUserByID(id int) (*models.User, error) {
 }
 
 func GetUserByEmailOrUsername(identifier string) (*models.User, error) {
-	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, created_at FROM users WHERE email = ? OR username = ?", identifier, identifier)
+	row := database.DB.QueryRow("SELECT id, email, username, password, bio, avatar_path, role, created_at FROM users WHERE email = ? OR username = ?", identifier, identifier)
 	user := &models.User{}
-	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password, &user.Bio, &user.AvatarPath, &user.Role, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -71,4 +71,27 @@ func EmailExists(email string, excludeUserID int) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func GetAllUsers() ([]models.User, error) {
+	rows, err := database.DB.Query("SELECT id, email, username, bio, avatar_path, role, created_at FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var users []models.User
+	for rows.Next() {
+		var u models.User
+		err := rows.Scan(&u.ID, &u.Email, &u.Username, &u.Bio, &u.AvatarPath, &u.Role, &u.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}
+
+func UpdateUserRole(userID int, role string) error {
+	_, err := database.DB.Exec("UPDATE users SET role = ? WHERE id = ?", role, userID)
+	return err
 }

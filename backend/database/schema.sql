@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL,
     bio TEXT,
     avatar_path TEXT DEFAULT '/static/images/profile/default.png',
+    role TEXT NOT NULL DEFAULT 'utilisateur',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -14,6 +15,8 @@ CREATE TABLE IF NOT EXISTS posts (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     image_path TEXT,
+    approved INTEGER NOT NULL DEFAULT 0,
+    moderation_flag TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

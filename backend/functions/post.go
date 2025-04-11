@@ -107,7 +107,7 @@ func GetPostByID(id int) (*models.Post, error) {
         SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
         FROM posts p
         JOIN users u ON p.user_id = u.id
-        WHERE p.id = ?
+        WHERE p.id = ? AND p.approved = 1
     `, id)
 	post := &models.Post{}
 	err := row.Scan(&post.ID, &post.UserID, &post.Username, &post.AvatarPath, &post.Title, &post.Content, &post.ImagePath, &post.CreatedAt)
@@ -141,7 +141,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
             JOIN users u ON p.user_id = u.id
             JOIN post_categories pc ON p.id = pc.post_id
             JOIN categories c ON pc.category_id = c.id
-            WHERE c.name = ?
+            WHERE c.name = ? AND p.approved = 1
             ORDER BY p.created_at DESC
         `
 		args = []interface{}{category}
@@ -150,7 +150,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
             SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
             FROM posts p
             JOIN users u ON p.user_id = u.id
-            WHERE p.user_id = ?
+            WHERE p.user_id = ? AND p.approved = 1
             ORDER BY p.created_at DESC
         `
 		args = []interface{}{userID}
@@ -160,7 +160,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
             FROM posts p
             JOIN users u ON p.user_id = u.id
             JOIN post_likes pl ON p.id = pl.post_id
-            WHERE pl.user_id = ? AND pl.value = 1
+            WHERE pl.user_id = ? AND pl.value = 1 AND p.approved = 1
             ORDER BY p.created_at DESC
         `
 		args = []interface{}{userID}
@@ -169,6 +169,7 @@ func GetPosts(filter, category string, userID int) ([]models.Post, error) {
             SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
             FROM posts p
             JOIN users u ON p.user_id = u.id
+            WHERE p.approved = 1
             ORDER BY p.created_at DESC
         `
 	}
@@ -297,4 +298,38 @@ func DeletePost(postID int) error {
 		return err
 	}
 	return DeleteOrphanCategories()
+}
+
+func GetPendingPosts() ([]models.Post, error) {
+	rows, err := database.DB.Query(`
+            SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.approved = 0
+            ORDER BY p.created_at DESC
+        `)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var posts []models.Post
+	for rows.Next() {
+		var p models.Post
+		err := rows.Scan(&p.ID, &p.UserID, &p.Username, &p.AvatarPath, &p.Title, &p.Content, &p.ImagePath, &p.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, p)
+	}
+	return posts, nil
+}
+
+func ApprovePost(postID int) error {
+	_, err := database.DB.Exec("UPDATE posts SET approved = 1, moderation_flag = NULL WHERE id = ?", postID)
+	return err
+}
+
+func RejectPost(postID int, flag string) error {
+	_, err := database.DB.Exec("UPDATE posts SET approved = 0, moderation_flag = ? WHERE id = ?", flag, postID)
+	return err
 }
