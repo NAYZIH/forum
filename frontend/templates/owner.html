@@ -41,7 +41,7 @@
                         <input type="hidden" name="user_id" value="{{.ID}}">
                         <select name="role">
                             <option value="utilisateur" {{if eq .Role "utilisateur"}}selected{{end}}>Utilisateur</option>
-                            <option value="moderateur" {{if eq .Role "moderateur"}}selected{{end}}>Modérateur</option>
+                            <option value="modérateur" {{if eq .Role "modérateur"}}selected{{end}}>Modérateur</option>
                             <option value="administrateur" {{if eq .Role "administrateur"}}selected{{end}}>Administrateur</option>
                             <option value="owner" {{if eq .Role "owner"}}selected{{end}}>Owner</option>
                         </select>

@@ -94,16 +94,17 @@ func GetAllUsers() ([]models.User, error) {
 }
 
 func UpdateUserRole(userID int, role string) error {
-	if role == "owner" {
-		var count int
-		err := database.DB.QueryRow("SELECT COUNT(*) FROM users WHERE role = 'owner' AND id != ?", userID).Scan(&count)
+	if role != "owner" {
+		var currentRole string
+		err := database.DB.QueryRow("SELECT role FROM users WHERE id = ?", userID).Scan(&currentRole)
 		if err != nil {
 			return err
 		}
-		if count > 0 {
+		if currentRole == "owner" {
 			return sql.ErrNoRows
 		}
 	}
+
 	_, err := database.DB.Exec("UPDATE users SET role = ? WHERE id = ?", role, userID)
 	return err
 }
