@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des signalements</title>
+    <link rel="stylesheet" href="/static/stylesheet/admin_reports.css">
+</head>
+<body>
+    <h1>Interface de gestion des signalements</h1>
+    <p>Connecté en tant que : {{.Admin.Username}} ({{.Admin.Role}})</p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Modérateur</th>
+                <th>Post ID</th>
+                <th>Commentaire ID</th>
+                <th>Raison</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Reports}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.ModeratorID}}</td>
+                <td>{{if .PostID}}{{.PostID}}{{else}}N/A{{end}}</td>
+                <td>{{if .CommentID}}{{.CommentID}}{{else}}N/A{{end}}</td>
+                <td>{{.Reason}}</td>
+                <td>{{.CreatedAt}}</td>
+                <td>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="report_id" value="{{.ID}}">
+                        <input type="hidden" name="action" value="review">
+                        <button type="submit">Marquer comme revu</button>
+                    </form>
+                    {{if .PostID}}
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="report_id" value="{{.ID}}">
+                        <input type="hidden" name="post_id" value="{{.PostID}}">
+                        <input type="hidden" name="action" value="delete_post">
+                        <button type="submit">Supprimer le post</button>
+                    </form>
+                    {{else if .CommentID}}
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="report_id" value="{{.ID}}">
+                        <input type="hidden" name="comment_id" value="{{.CommentID}}">
+                        <input type="hidden" name="action" value="delete_comment">
+                        <button type="submit">Supprimer le commentaire</button>
+                    </form>
+                    {{end}}
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+    <p><a href="/">Retour à l'accueil</a></p>
+</body>
+</html>

@@ -34,6 +34,9 @@ func Launcher() {
 	http.HandleFunc("/moderation", handlers.ModerationHandler)
 	http.HandleFunc("/admin", handlers.AdminHandler)
 
+	http.HandleFunc("/report", handlers.ReportHandler)
+	http.HandleFunc("/admin/report", handlers.AdminReportHandler)
+
 	http.HandleFunc("/ws", websocket.HandleConnections)
 	go websocket.HandleMessages()
 

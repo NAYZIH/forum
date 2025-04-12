@@ -89,3 +89,16 @@ CREATE TABLE IF NOT EXISTS notifications (
     FOREIGN KEY (comment_id) REFERENCES comments(id),
     FOREIGN KEY (from_user_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    moderator_id INTEGER NOT NULL,
+    post_id INTEGER,
+    comment_id INTEGER,
+    reason TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status TEXT NOT NULL DEFAULT 'pending',
+    FOREIGN KEY (moderator_id) REFERENCES users(id),
+    FOREIGN KEY (post_id) REFERENCES posts(id),
+    FOREIGN KEY (comment_id) REFERENCES comments(id)
+);

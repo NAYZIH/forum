@@ -83,6 +83,13 @@
                             <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">Supprimer</button>
                         </form>
                     {{end}}
+                    {{if or (eq .User.Role "modérateur") (eq .User.Role "administrateur") (eq .User.Role "owner")}}
+                        <form action="/report" method="post" style="display:inline; margin-left: 10px;">
+                            <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                            <input type="text" name="reason" placeholder="Raison du signalement" required style="width: 150px;">
+                            <button type="submit">Signaler le post</button>
+                        </form>
+                    {{end}}
                 {{end}}
             </div>
         </div>
@@ -119,6 +126,13 @@
                             <a href="/comment/{{.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
                             <form action="/comment/{{.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
                                 <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">Supprimer</button>
+                            </form>
+                        {{end}}
+                        {{if or (eq $.User.Role "modérateur") (eq $.User.Role "administrateur") (eq $.User.Role "owner")}}
+                            <form action="/report" method="post" style="display:inline; margin-left: 10px;">
+                                <input type="hidden" name="comment_id" value="{{.ID}}">
+                                <input type="text" name="reason" placeholder="Raison du signalement" required style="width: 150px;">
+                                <button type="submit">Signaler le commentaire</button>
                             </form>
                         {{end}}
                     {{end}}
