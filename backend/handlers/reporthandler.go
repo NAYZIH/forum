@@ -25,7 +25,7 @@ func ReportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Utilisateur introuvable", http.StatusInternalServerError)
 		return
 	}
-	if user.Role != "modérateur" && user.Role != "administrateur" {
+	if user.Role != "modérateur" && user.Role != "administrateur" && user.Role != "owner" {
 		http.Error(w, "Accès refusé", http.StatusForbidden)
 		return
 	}
@@ -80,7 +80,7 @@ func AdminReportHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Utilisateur introuvable", http.StatusInternalServerError)
 		return
 	}
-	if adminUser.Role != "administrateur" {
+	if adminUser.Role != "administrateur" && adminUser.Role != "owner" {
 		http.Error(w, "Accès refusé", http.StatusForbidden)
 		return
 	}
