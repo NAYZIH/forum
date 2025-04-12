@@ -2,12 +2,13 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Administration des utilisateurs</title>
+    <title>Administration</title>
     <link rel="stylesheet" href="/static/stylesheet/admin.css">
 </head>
 <body>
     <h1>Interface d'administration</h1>
-    <p>Connecté en tant qu'administrateur : {{.Admin.Username}}</p>
+    <p>Connecté en tant que : {{.Admin.Username}} ({{.Admin.Role}})</p>
+    <p><a href="/admin/post">Gérer les posts</a></p> 
     <table border="1">
         <thead>
             <tr>
@@ -15,7 +16,7 @@
                 <th>Email</th>
                 <th>Nom d'utilisateur</th>
                 <th>Rôle</th>
-                <th>Action</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -26,9 +27,9 @@
                 <td>{{.Username}}</td>
                 <td>{{.Role}}</td>
                 <td>
-                    <form method="post">
+                    <form method="post" style="display:inline;">
                         <input type="hidden" name="user_id" value="{{.ID}}">
-                        <select name="role" required>
+                        <select name="role">
                             <option value="utilisateur" {{if eq .Role "utilisateur"}}selected{{end}}>Utilisateur</option>
                             <option value="modérateur" {{if eq .Role "modérateur"}}selected{{end}}>Modérateur</option>
                             <option value="administrateur" {{if eq .Role "administrateur"}}selected{{end}}>Administrateur</option>

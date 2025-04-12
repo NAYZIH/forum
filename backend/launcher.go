@@ -33,6 +33,7 @@ func Launcher() {
 
 	http.HandleFunc("/moderation", handlers.ModerationHandler)
 	http.HandleFunc("/admin", handlers.AdminHandler)
+	http.HandleFunc("/admin/post", handlers.AdminPostsHandler)
 
 	http.HandleFunc("/report", handlers.ReportHandler)
 	http.HandleFunc("/admin/report", handlers.AdminReportHandler)

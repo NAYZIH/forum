@@ -102,6 +102,51 @@ func UpdatePost(postID int, title, content string, categories []string, imagePat
 	return DeleteOrphanCategories()
 }
 
+func UpdatePostCategories(postID int, categories []string) error {
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM post_categories WHERE post_id = ?", postID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	for _, cat := range categories {
+		if cat == "" {
+			continue
+		}
+		var catID int
+		err = tx.QueryRow("SELECT id FROM categories WHERE name = ?", cat).Scan(&catID)
+		if err == sql.ErrNoRows {
+			res, err := tx.Exec("INSERT INTO categories (name) VALUES (?)", cat)
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+			catID64, err := res.LastInsertId()
+			if err != nil {
+				tx.Rollback()
+				return err
+			}
+			catID = int(catID64)
+		} else if err != nil {
+			tx.Rollback()
+			return err
+		}
+		_, err = tx.Exec("INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)", postID, catID)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return DeleteOrphanCategories()
+}
+
 func GetPostByID(id int) (*models.Post, error) {
 	row := database.DB.QueryRow(`
         SELECT p.id, p.user_id, u.username, u.avatar_path, p.title, p.content, p.image_path, p.created_at

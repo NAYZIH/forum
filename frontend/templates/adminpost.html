@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Posts</title>
+</head>
+<body>
+    <h1>Gestion des Posts</h1>
+    <p>Connecté en tant que : {{.Admin.Username}} ({{.Admin.Role}})</p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Titre</th>
+                <th>Auteur</th>
+                <th>Catégories</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Posts}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Title}}</td>
+                <td>{{.Username}}</td>
+                <td>{{range .Categories}}{{.}}, {{end}}</td>
+                <td>
+                    <form method="post" action="/admin/post">
+                        <input type="hidden" name="post_id" value="{{.ID}}">
+                        <input type="text" name="categories" placeholder="Catégories (séparées par des virgules)">
+                        <button type="submit">Modifier Catégories</button>
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</body>
+</html>
