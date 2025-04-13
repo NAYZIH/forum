@@ -95,3 +95,17 @@ func UpdateUserRole(userID int, role string) error {
 	_, err := database.DB.Exec("UPDATE users SET role = ? WHERE id = ?", role, userID)
 	return err
 }
+
+func DeleteUser(userID int) error {
+	_, err := database.DB.Exec("DELETE FROM users WHERE id = ?", userID)
+	if err != nil {
+		return err
+	}
+	_, err = database.DB.Exec("DELETE FROM sessions WHERE user_id = ?", userID)
+	return err
+}
+
+func DeleteUserSessions(userID int) error {
+	_, err := database.DB.Exec("DELETE FROM sessions WHERE user_id = ?", userID)
+	return err
+}

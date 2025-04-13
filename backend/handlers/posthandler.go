@@ -220,7 +220,18 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		session, err := auth.GetSession(sessionID.Value)
-		if err != nil || session == nil || session.UserID != post.UserID {
+		if err != nil || session == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		// Récupération de l'utilisateur connecté avec son rôle
+		user, err := functions.GetUserByID(session.UserID)
+		if err != nil {
+			ErrorHandler(w, r, http.StatusInternalServerError)
+			return
+		}
+		// Vérification : auteur OU owner
+		if session.UserID != post.UserID && user.Role != "owner" {
 			http.Error(w, "Non autorisé", http.StatusUnauthorized)
 			return
 		}
@@ -244,9 +255,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 				ErrorHandler(w, r, http.StatusInternalServerError)
 				return
 			}
-			user, _ := functions.GetUserByID(session.UserID)
 			unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
-
 			data := struct {
 				Post        *models.Post
 				Categories  []string
@@ -301,9 +310,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 					ErrorHandler(w, r, http.StatusInternalServerError)
 					return
 				}
-				user, _ := functions.GetUserByID(session.UserID)
 				unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
-
 				data := struct {
 					Post        *models.Post
 					Categories  []string
@@ -313,11 +320,12 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 				}{
 					Post:        post,
 					Categories:  categories,
-					Error:       "",
+					Error:       "Vous devez sélectionner au moins une catégorie.",
 					User:        user,
 					UnreadCount: unreadCount,
 				}
 				t.Execute(w, data)
+				return
 			}
 			file, handler, err := r.FormFile("image")
 			var imagePath string
@@ -343,9 +351,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 						ErrorHandler(w, r, http.StatusInternalServerError)
 						return
 					}
-					user, _ := functions.GetUserByID(session.UserID)
 					unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
-
 					data := struct {
 						Post        *models.Post
 						Categories  []string
@@ -355,11 +361,12 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 					}{
 						Post:        post,
 						Categories:  categories,
-						Error:       "",
+						Error:       "L'image est trop volumineuse (max 20 Mo).",
 						User:        user,
 						UnreadCount: unreadCount,
 					}
 					t.Execute(w, data)
+					return
 				}
 				ext := strings.ToLower(filepath.Ext(handler.Filename))
 				allowedExts := []string{".jpg", ".jpeg", ".png", ".gif"}
@@ -390,9 +397,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 						ErrorHandler(w, r, http.StatusInternalServerError)
 						return
 					}
-					user, _ := functions.GetUserByID(session.UserID)
 					unreadCount, _ := functions.GetUnreadNotificationCount(session.UserID)
-
 					data := struct {
 						Post        *models.Post
 						Categories  []string
@@ -402,7 +407,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 					}{
 						Post:        post,
 						Categories:  categories,
-						Error:       "",
+						Error:       "Extension d'image non supportée (JPEG, PNG, GIF uniquement).",
 						User:        user,
 						UnreadCount: unreadCount,
 					}
@@ -518,7 +523,12 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 			ErrorHandler(w, r, http.StatusNotFound)
 			return
 		}
-		if session.UserID != post.UserID {
+		user, err := functions.GetUserByID(session.UserID)
+		if err != nil {
+			ErrorHandler(w, r, http.StatusInternalServerError)
+			return
+		}
+		if session.UserID != post.UserID && user.Role != "owner" {
 			http.Error(w, "Non autorisé", http.StatusUnauthorized)
 			return
 		}

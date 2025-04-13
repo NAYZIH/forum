@@ -32,18 +32,18 @@ func Launcher() {
 	http.HandleFunc("/callback/github", handlers.GithubCallbackHandler)
 
 	http.HandleFunc("/moderation", handlers.ModerationHandler)
-	http.HandleFunc("/admin", handlers.AdminHandler)
-	http.HandleFunc("/admin/post", handlers.AdminPostsHandler)
-
 	http.HandleFunc("/report", handlers.ReportHandler)
+	http.HandleFunc("/admin", handlers.AdminHandler)
 	http.HandleFunc("/admin/report", handlers.AdminReportHandler)
+	http.HandleFunc("/admin/post", handlers.AdminPostsHandler)
+	http.HandleFunc("/owner", handlers.OwnerHandler)
 
 	http.HandleFunc("/ws", websocket.HandleConnections)
 	go websocket.HandleMessages()
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/static"))))
 
-	port := ":1945"
+	port := ":3945"
 	fmt.Printf("Serveur démarré sur http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, nil))
 }

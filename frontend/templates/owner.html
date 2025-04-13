@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Owner</title>
+    <link rel="stylesheet" href="/static/stylesheet/owner.css">
+</head>
+<body>
+    <h1>Interface owner</h1>
+    <p>Connecté en tant que : {{.Owner.Username}} (Owner)</p>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom d'utilisateur</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Users}}
+                    <tr>
+                        <td>{{.ID}}</td>
+                        <td>{{.Username}}</td>
+                        <td>{{.Email}}</td>
+                        <td>{{.Role}}</td>
+                        <td>
+                            <form action="/owner" method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="update_user_role">
+                                <input type="hidden" name="user_id" value="{{.ID}}">
+                                <select name="role">
+                                    <option value="utilisateur" {{if eq .Role "utilisateur"}}selected{{end}}>Utilisateur</option>
+                                    <option value="modérateur" {{if eq .Role "modérateur"}}selected{{end}}>Modérateur</option>
+                                    <option value="administrateur" {{if eq .Role "administrateur"}}selected{{end}}>Administrateur</option>
+                                    <option value="owner" {{if eq .Role "owner"}}selected{{end}}>Owner</option>
+                                </select>
+                                <button type="submit">Modifier</button>
+                            </form>
+                            <form action="/owner" method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="delete_user">
+                                <input type="hidden" name="user_id" value="{{.ID}}">
+                                <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</button>
+                            </form>
+                            <form action="/owner" method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="force_logout">
+                                <input type="hidden" name="user_id" value="{{.ID}}">
+                                <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir forcer la déconnexion de cet utilisateur ?');">Forcer déconnexion</button>
+                            </form>
+                        </td>
+                    </tr>
+                {{end}}
+            </tbody>
+        </table>
+
+        <p><a href="/">Retour à l'accueil</a></p>
+</body>
+</html>

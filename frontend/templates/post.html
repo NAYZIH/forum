@@ -77,13 +77,13 @@
                         <input type="hidden" name="action" value="dislike">
                         <button type="submit">Dislike</button>
                     </form>
-                    {{if eq .User.ID .Post.UserID}}
+                    {{if or (eq .User.ID .Post.UserID) (eq .User.Role "owner")}}
                         <a href="/post/{{.Post.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
                         <form action="/post/{{.Post.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
                             <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?');">Supprimer</button>
                         </form>
                     {{end}}
-                    {{if or (eq .User.Role "modérateur") (eq .User.Role "administrateur") (eq .User.Role "owner")}}
+                    {{if or (eq .User.Role "modérateur")}}
                         <form action="/report" method="post" style="display:inline; margin-left: 10px;">
                             <input type="hidden" name="post_id" value="{{.Post.ID}}">
                             <input type="text" name="reason" placeholder="Raison du signalement" required style="width: 150px;">
@@ -122,13 +122,13 @@
                             <input type="hidden" name="action" value="dislike">
                             <button type="submit">Dislike</button>
                         </form>
-                        {{if eq $.User.ID .UserID}}
+                        {{if or (eq $.User.ID .UserID) (eq $.User.Role "owner")}}
                             <a href="/comment/{{.ID}}/edit" style="display:inline; margin-left: 10px;">Modifier</a>
                             <form action="/comment/{{.ID}}/delete" method="post" style="display:inline; margin-left: 10px;">
                                 <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">Supprimer</button>
                             </form>
                         {{end}}
-                        {{if or (eq $.User.Role "modérateur") (eq $.User.Role "administrateur") (eq $.User.Role "owner")}}
+                        {{if or (eq $.User.Role "modérateur")}}
                             <form action="/report" method="post" style="display:inline; margin-left: 10px;">
                                 <input type="hidden" name="comment_id" value="{{.ID}}">
                                 <input type="text" name="reason" placeholder="Raison du signalement" required style="width: 150px;">

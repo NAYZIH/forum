@@ -102,3 +102,21 @@ CREATE TABLE IF NOT EXISTS reports (
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (comment_id) REFERENCES comments(id)
 );
+
+CREATE TRIGGER IF NOT EXISTS limit_owner_role
+BEFORE INSERT ON users
+WHEN NEW.role = 'owner'
+BEGIN
+    SELECT RAISE(ABORT, 'Il ne peut y avoir qu''un seul utilisateur avec le rôle "owner"')
+    FROM users
+    WHERE role = 'owner';
+END;
+
+CREATE TRIGGER IF NOT EXISTS limit_owner_role_update
+BEFORE UPDATE OF role ON users
+WHEN NEW.role = 'owner'
+BEGIN
+    SELECT RAISE(ABORT, 'Il ne peut y avoir qu''un seul utilisateur avec le rôle "owner"')
+    FROM users
+    WHERE role = 'owner' AND id != NEW.id;
+END;
