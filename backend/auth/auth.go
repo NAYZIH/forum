@@ -40,7 +40,7 @@ func init() {
 	GoogleOauthConfig = &oauth2.Config{
 		ClientID:     config.GoogleClientID,
 		ClientSecret: config.GoogleClientSecret,
-		RedirectURL:  "http://localhost:1945/callback/google",
+		RedirectURL:  "http://localhost:3945/callback/google",
 		Scopes:       []string{"openid", "email", "profile"},
 		Endpoint:     google.Endpoint,
 	}
@@ -48,7 +48,7 @@ func init() {
 	GithubOauthConfig = &oauth2.Config{
 		ClientID:     config.GithubClientID,
 		ClientSecret: config.GithubClientSecret,
-		RedirectURL:  "http://localhost:1945/callback/github",
+		RedirectURL:  "http://localhost:3945/callback/github",
 		Scopes:       []string{"user"},
 		Endpoint:     github.Endpoint,
 	}

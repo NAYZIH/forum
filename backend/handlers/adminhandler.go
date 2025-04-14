@@ -58,6 +58,18 @@ func AdminHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "ID de l'utilisateur invalide", http.StatusBadRequest)
 			return
 		}
+
+		targetUser, err := functions.GetUserByID(userID)
+		if err != nil {
+			http.Error(w, "Utilisateur cible introuvable", http.StatusInternalServerError)
+			return
+		}
+
+		if targetUser.Role == "owner" && adminUser.Role == "administrateur" {
+			http.Error(w, "Un administrateur ne peut pas modifier le rôle d'un owner", http.StatusForbidden)
+			return
+		}
+
 		err = functions.UpdateUserRole(userID, role)
 		if err != nil {
 			http.Error(w, "Erreur lors de la mise à jour du rôle", http.StatusInternalServerError)
