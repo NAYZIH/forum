@@ -45,6 +45,28 @@
         </div>
     </div>
 
+    {{/* Barre de privilèges dynamique */}}
+    {{if .User}}
+    <nav class="privilege-nav">
+        {{/* accès modération pour modérateur, administrateur et owner */}}
+        {{if or (eq .User.Role "modérateur") (eq .User.Role "administrateur") (eq .User.Role "owner")}}
+            <a href="/moderation">MODÉRATION</a>
+        {{end}}
+
+        {{/* accès administration pour administrateur et owner */}}
+        {{if or (eq .User.Role "administrateur") (eq .User.Role "owner")}}
+            <a href="/admin">ADMINISTRATION</a>
+            <a href="/admin/report">SIGNALEMENTS</a>
+            <a href="/admin/post">GESTION DES POSTS</a>
+        {{end}}
+
+        {{/* accès interface owner uniquement pour owner */}}
+        {{if eq .User.Role "owner"}}
+            <a href="/owner">INTERFACE OWNER</a>
+        {{end}}
+    </nav>
+    {{end}}
+
     <div class="breadcrumb">
         <p>BIENVENUE, {{if .User}}{{.User.Username}}{{else}}INVITÉ. <a href="/login">Connexion</a> ou <a href="/register">Inscription</a>{{end}}.</p>
     </div>

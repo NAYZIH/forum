@@ -323,3 +323,24 @@ a:hover {
     color: #FFFFFF;
     font-size: 12px;
 }
+
+.privilege-nav {
+    background: #1A2526;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.privilege-nav a {
+    color: #FFFFFF;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.privilege-nav a:hover {
+    color: #FFD700;
+}
